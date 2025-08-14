@@ -1,8 +1,12 @@
 {
   "name": "ui-inspection-tool-web",
   "version": "1.0.0",
-  "description": "Web版UI走查工具",
+  "description": "Professional UI inspection tool for developers and designers",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "dependencies": {
     "exceljs": "^4.3.0",
     "html2canvas": "^1.4.1",

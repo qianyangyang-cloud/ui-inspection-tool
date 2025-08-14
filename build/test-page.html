@@ -35,6 +35,7 @@
             font-size: 24px;
             font-weight: bold;
             color: #333;
+            margin-left: 2px; /* 故意偏移2px用于测试 */
         }
         
         .nav {
@@ -76,6 +77,7 @@
         .btn-signup {
             background: #667eea;
             color: white;
+            width: 72px; /* 故意调整宽度用于测试第二页 */
         }
         
         .btn:hover {
@@ -160,47 +162,166 @@
             font-size: 14px;
             opacity: 0.8;
         }
+        
+        .page-nav {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 16px;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .page-btn:hover {
+            background: #f0f0f0;
+        }
+        
+        .page-btn.active:hover {
+            background: #667eea;
+        }
+        
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="logo">UI Inspector</div>
-        <nav class="nav">
-            <a href="#">首页</a>
-            <a href="#">功能</a>
-            <a href="#">案例</a>
-            <a href="#">帮助</a>
-        </nav>
-        <div class="auth-buttons">
-            <button class="btn btn-login">登录</button>
-            <button class="btn btn-signup">注册</button>
-        </div>
-    </header>
-    
-    <main class="main">
-        <div class="hero">
-            <h1>专业的UI走查工具</h1>
-            <p>帮助设计师和开发者进行精确的设计稿对比，确保像素级的完美还原</p>
-            <button class="cta-button">立即体验</button>
-            
-            <div class="features">
-                <div class="feature">
-                    <div class="feature-icon">🎨</div>
-                    <h3>设计对比</h3>
-                    <p>1:1像素对比</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">📱</div>
-                    <h3>多尺寸支持</h3>
-                    <p>适配各种屏幕</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">✨</div>
-                    <h3>问题标记</h3>
-                    <p>快速标记问题</p>
+    <!-- 页面1：首页 -->
+    <div id="page1" class="page-content active">
+        <header class="header">
+            <div class="logo">UI Inspector</div>
+            <nav class="nav">
+                <a href="#">首页</a>
+                <a href="#">功能</a>
+                <a href="#">案例</a>
+                <a href="#">帮助</a>
+            </nav>
+            <div class="auth-buttons">
+                <button class="btn btn-login">登录</button>
+                <button class="btn btn-signup">注册</button>
+            </div>
+        </header>
+        
+        <main class="main">
+            <div class="hero">
+                <h1>专业的UI走查工具</h1>
+                <p>帮助设计师和开发者进行精确的设计稿对比，确保像素级的完美还原</p>
+                <button class="cta-button">立即体验</button>
+                
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">🎨</div>
+                        <h3>设计对比</h3>
+                        <p>1:1像素对比</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📱</div>
+                        <h3>多尺寸支持</h3>
+                        <p>适配各种屏幕</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">✨</div>
+                        <h3>问题标记</h3>
+                        <p>快速标记问题</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
+
+    <!-- 页面2：产品详情页 -->
+    <div id="page2" class="page-content">
+        <header class="header">
+            <div class="logo">UI Inspector</div>
+            <nav class="nav">
+                <a href="#">产品</a>
+                <a href="#">定价</a>
+                <a href="#">文档</a>
+                <a href="#">支持</a>
+            </nav>
+            <div class="auth-buttons">
+                <button class="btn btn-login">登录</button>
+                <button class="btn btn-signup">免费试用</button>
+            </div>
+        </header>
+        
+        <main class="main">
+            <div class="hero">
+                <h1>强大的功能特性</h1>
+                <p>深入了解 UI Inspector 的核心功能，让设计走查变得更加高效和精准</p>
+                <button class="cta-button">开始使用</button>
+                
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">⚡</div>
+                        <h3>实时对比</h3>
+                        <p>毫秒级响应</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🔍</div>
+                        <h3>像素级精度</h3>
+                        <p>精确到1px</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📊</div>
+                        <h3>智能分析</h3>
+                        <p>自动检测差异</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 页面导航 -->
+    <div class="page-nav">
+        <button class="page-btn active" onclick="showPage(1)">首页</button>
+        <button class="page-btn" onclick="showPage(2)">功能介绍</button>
+    </div>
+
+    <script>
+        function showPage(pageNum) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 移除所有按钮的active状态
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示指定页面
+            document.getElementById('page' + pageNum).classList.add('active');
+            
+            // 激活对应按钮
+            document.querySelectorAll('.page-btn')[pageNum - 1].classList.add('active');
+        }
+    </script>
 </body>
 </html>
