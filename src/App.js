@@ -740,7 +740,7 @@ function App() {
                   <div className="placeholder-content">
                     <h3>Welcome to UI Inspection Tool</h3>
                     <p>Please paste the frontend test page URL in the input box above</p>
-                    <p className="placeholder-example">Supports: http://localhost:3000, dev environment IPs, test environment domains, etc.</p>
+                    <p className="placeholder-example">Supports: https://staging.yoursite.com,https://demo.yourapp.com, or any publicly accessible URL</p>
                     <div className="placeholder-steps">
                       <div className="step">1. Enter frontend page URL</div>
                       <div className="step">2. Click "Load Page"</div>
