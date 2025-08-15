@@ -729,7 +729,7 @@ function App() {
                   className="preview-iframe"
                   src={currentUrl}
                   title="Web Preview"
-                  sandbox="allow-same-origin allow-scripts allow-forms"
+                  sandbox="allow-same-origin allow-scripts allow-forms allow-top-navigation allow-unsafe-inline"
                   style={{
                     width: designSize.width,
                     height: designSize.height
