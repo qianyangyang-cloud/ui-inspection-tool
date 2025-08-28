@@ -4300,7 +4300,7 @@ function App() {
         <div className="modal-overlay">
           <div className="video-tutorial-modal">
             <div className="video-tutorial-header">
-              <h3>📹 使用教程</h3>
+              <h3>📹tutoria</h3>
               <button 
                 className="modal-close-btn"
                 onClick={() => setShowVideoTutorial(false)}
@@ -4319,7 +4319,7 @@ function App() {
                 您的浏览器不支持视频播放，请升级到最新版本的浏览器。
               </video>
               <p className="video-description">
-                本视频详细演示了UI走查工具的完整使用流程，包括页面加载、设计图上传、问题标记和报告导出等功能。
+                This video demonstrates the complete usage process of the UI Walkthrough tool in detail, including page loading, design drawing upload, problem marking, and report export.
               </p>
             </div>
             <div className="video-tutorial-actions">
