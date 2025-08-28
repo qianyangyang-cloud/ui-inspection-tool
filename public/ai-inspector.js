@@ -1,6 +1,6 @@
 /**
  * AI Inspection Core Module
- * Integrated pixel difference detection + UI element classification + image segmentation + AI report generation
+ * Integrated pixel difference detection + UI element classification + image cropping + Qwen report generation
  */
 
 class AIInspector {
@@ -10,7 +10,7 @@ class AIInspector {
   }
 
   /**
-   * Main entry point: Execute AI inspection
+   * Main entry: Execute AI inspection
    * @param {string} designImageData - Design image base64 data
    * @param {HTMLCanvasElement} webpageCanvas - Webpage screenshot canvas
    * @returns {Object} Inspection results
@@ -52,7 +52,7 @@ class AIInspector {
         problemDescriptions
       );
 
-      console.log(`✅ AI inspection completed, found ${problemAreas.length} issues`);
+      console.log(`✅ AI inspection complete, found ${problemAreas.length} issues`);
 
       return {
         success: true,
@@ -80,11 +80,11 @@ class AIInspector {
     // Load design image
     const designImg = await this.loadImage(designImageData);
     
-    // Standardize dimensions
+    // Unify dimensions
     const targetWidth = Math.min(designImg.width, webpageCanvas.width);
     const targetHeight = Math.min(designImg.height, webpageCanvas.height);
 
-    // Create canvas with unified dimensions
+    // Create unified dimension canvas
     const designCanvas = this.createCanvas(targetWidth, targetHeight);
     const designCtx = designCanvas.getContext('2d');
     designCtx.drawImage(designImg, 0, 0, targetWidth, targetHeight);
@@ -110,7 +110,7 @@ class AIInspector {
     // Create overlay image (for final display)
     const overlayCanvas = this.createOverlayCanvas(designCanvas, webCanvas, mergedRegions);
     
-    // Create overlay image without numbers (for screenshots)
+    // Create overlay without numbers (for screenshots)
     const cleanOverlayCanvas = this.createOverlayCanvasWithoutNumbers(designCanvas, webCanvas, mergedRegions);
 
     console.log(`Found ${mergedRegions.length} difference regions, overall similarity: ${(similarity*100).toFixed(1)}%`);
@@ -147,13 +147,13 @@ class AIInspector {
    * Detect difference regions
    */
   detectDifferenceRegions(diffMap, width, height) {
-    // Binary processing
+    // Binarization processing
     const binaryMap = new Uint8Array(width * height);
     for (let i = 0; i < diffMap.length; i++) {
       binaryMap[i] = diffMap[i] > 0 ? 255 : 0;
     }
 
-    // Morphological operations (simplified)
+    // Morphological operations (simplified version)
     const processedMap = this.morphologyClose(binaryMap, width, height, 15);
     
     // Connected region detection
@@ -163,13 +163,13 @@ class AIInspector {
   }
 
   /**
-   * Morphological closing operation (simplified)
+   * 形态学闭运算（简化版）
    */
   morphologyClose(binaryMap, width, height, kernelSize) {
     const result = new Uint8Array(binaryMap.length);
     const half = Math.floor(kernelSize / 2);
     
-    // Dilation
+    // 膨胀
     for (let y = half; y < height - half; y++) {
       for (let x = half; x < width - half; x++) {
         let hasWhite = false;
@@ -189,7 +189,7 @@ class AIInspector {
       }
     }
     
-    // Erosion
+    // 腐蚀
     const final = new Uint8Array(result.length);
     for (let y = half; y < height - half; y++) {
       for (let x = half; x < width - half; x++) {
@@ -214,7 +214,7 @@ class AIInspector {
   }
 
   /**
-   * Connected region detection
+   * 连通区域检测
    */
   findConnectedRegions(binaryMap, width, height) {
     const visited = new Array(width * height).fill(false);
@@ -238,7 +238,7 @@ class AIInspector {
   }
 
   /**
-   * Flood fill algorithm
+   * 洪水填充算法
    */
   floodFill(binaryMap, visited, startX, startY, width, height, regionId) {
     const stack = [{x: startX, y: startY}];
@@ -262,14 +262,14 @@ class AIInspector {
       minY = Math.min(minY, y);
       maxY = Math.max(maxY, y);
 
-      // 4-connectivity
+      // 4连通
       stack.push({x: x+1, y: y});
       stack.push({x: x-1, y: y});
       stack.push({x: x, y: y+1});
       stack.push({x: x, y: y-1});
     }
 
-    // Expand boundaries
+    // 扩展边界
     const margin = 15;
     return {
       id: regionId,
@@ -283,14 +283,14 @@ class AIInspector {
   }
 
   /**
-   * Merge nearby regions (enhanced version)
+   * 合并相近区域（增强版）
    */
   mergeNearbyRegions(regions, threshold = 80) {
     if (regions.length <= 1) return regions;
 
-    console.log(`Starting to merge ${regions.length} regions...`);
+    console.log(`Starting merge of ${regions.length} regions...`);
 
-    // Step 1: Sort by region size, prioritize larger regions
+    // Step 1: Sort by region size, prioritize processing large regions
     const sortedRegions = regions.sort((a, b) => (b.width * b.height) - (a.width * a.height));
     
     const merged = [];
@@ -302,7 +302,7 @@ class AIInspector {
       const group = [sortedRegions[i]];
       used[i] = true;
 
-      // Find nearby regions - use stricter merge criteria
+      // Find nearby regions - use stricter merge conditions
       for (let j = i + 1; j < sortedRegions.length; j++) {
         if (used[j]) continue;
 
@@ -345,13 +345,13 @@ class AIInspector {
         const region1Area = regions[i].width * regions[i].height;
         const region2Area = filtered[j].width * filtered[j].height;
         
-        // If overlap exceeds 70%, consider as duplicate regions
+        // If overlap exceeds 70%, consider as duplicate region
         const overlapRatio1 = overlapArea / region1Area;
         const overlapRatio2 = overlapArea / region2Area;
         
         if (overlapRatio1 > 0.7 || overlapRatio2 > 0.7) {
           isDuplicate = true;
-          // Keep the larger region
+          // Keep larger region
           if (region1Area > region2Area) {
             filtered[j] = regions[i];
           }
@@ -368,7 +368,7 @@ class AIInspector {
   }
 
   /**
-   * Calculate overlap area between two regions
+   * 计算两个区域的重叠面积
    */
   calculateOverlapArea(region1, region2) {
     const left = Math.max(region1.x, region2.x);
@@ -384,7 +384,7 @@ class AIInspector {
   }
 
   /**
-   * Determine if regions should be merged (stricter criteria)
+   * 判断是否应该合并区域（更严格的条件）
    */
   shouldMergeRegions(region1, region2, threshold) {
     const cx1 = region1.x + region1.width / 2;
@@ -394,27 +394,27 @@ class AIInspector {
 
     const distance = Math.sqrt((cx1 - cx2)**2 + (cy1 - cy2)**2);
     
-    // Calculate region size differences
+    // 计算区域尺寸差异
     const area1 = region1.width * region1.height;
     const area2 = region2.width * region2.height;
     const sizeRatio = Math.min(area1, area2) / Math.max(area1, area2);
     
-    // Calculate overlap ratio
+    // 计算重叠度
     const overlapArea = this.calculateOverlapArea(region1, region2);
     const overlapRatio = overlapArea / Math.min(area1, area2);
     
-    // Stricter merging criteria
+    // 更严格的合并条件
     const shouldMerge = (
-      // 1. Close distance and similar size
+      // 1. 距离很近且大小相似
       (distance < threshold * 0.8 && sizeRatio > 0.3) ||
-      // 2. Has overlap within reasonable range
+      // 2. 有重叠且在合理范围内
       (overlapRatio > 0.1 && overlapRatio < 0.9) ||
-      // 3. Horizontally or vertically aligned with moderate distance
+      // 3. 水平或垂直对齐且距离适中
       (Math.abs(cy1 - cy2) < 25 && distance < threshold && sizeRatio > 0.2) ||
       (Math.abs(cx1 - cx2) < 25 && distance < threshold && sizeRatio > 0.2)
     );
     
-    // But don't merge regions that differ too much
+    // 但不要合并相差太大的区域
     if (Math.max(area1, area2) / Math.min(area1, area2) > 10) {
       return false;
     }
@@ -423,7 +423,7 @@ class AIInspector {
   }
 
   /**
-   * Create merged region
+   * 创建合并区域
    */
   createMergedRegion(regions, id) {
     const minX = Math.min(...regions.map(r => r.x));
@@ -444,7 +444,7 @@ class AIInspector {
   }
 
   /**
-   * UI element classification
+   * UI元素分类
    */
   classifyUIElements(regions, canvas) {
     console.log('🎯 Starting UI element classification...');
@@ -468,18 +468,18 @@ class AIInspector {
   }
 
   /**
-   * Classify elements by features
+   * 根据特征分类元素
    */
   classifyByFeatures(width, height, x, y, imgWidth, imgHeight) {
     const area = width * height;
     const aspectRatio = width / height;
     
-    // Position analysis
+    // 位置分析
     const isTop = y < imgHeight * 0.2;
     const isCenter = y > imgHeight * 0.3 && y < imgHeight * 0.7;
     const isBottom = y > imgHeight * 0.8;
 
-    // Classification logic
+    // 分类逻辑
     if (isTop && height < 60 && width > 200) {
       return 'header';
     } else if (height < 40 && width > 150 && aspectRatio > 3) {
@@ -500,7 +500,7 @@ class AIInspector {
   }
 
   /**
-   * Generate region screenshots
+   * 生成区域截图
    */
   async generateRegionScreenshots(regions, overlayCanvas) {
     console.log('📸 Generating region screenshots...');
@@ -510,18 +510,18 @@ class AIInspector {
     for (let i = 0; i < regions.length; i++) {
       const region = regions[i];
       
-      // Create region screenshot canvas
+      // 创建区域截图canvas
       const regionCanvas = this.createCanvas(region.width, region.height);
       const regionCtx = regionCanvas.getContext('2d');
       
-      // Crop region from clean overlay image (no longer contains numbers)
+      // 从干净的叠加图中裁剪区域（已经不包含序号）
       regionCtx.drawImage(
         overlayCanvas,
         region.x, region.y, region.width, region.height,
         0, 0, region.width, region.height
       );
 
-      // Draw red border on region screenshot
+      // 在区域截图上画红色边框
       regionCtx.strokeStyle = 'red';
       regionCtx.lineWidth = 3;
       regionCtx.strokeRect(0, 0, region.width, region.height);
@@ -537,10 +537,10 @@ class AIInspector {
           width: region.width,
           height: region.height
         },
-        // Add difference analysis data
+        // 添加差异分析数据
         diffAnalysis: {
           area: region.area,
-          pixelCount: region.area,  // Number of different pixels
+          pixelCount: region.area,  // 差异像素数量
           severity: this.calculateSeverity(region.area),
           aspectRatio: region.width / region.height,
           isLargeArea: region.area > 8000,
@@ -556,19 +556,19 @@ class AIInspector {
   }
 
   /**
-   * Create overlay image without numbers (for screenshots)
+   * 创建不带序号的叠加图（用于截图）
    */
   createOverlayCanvasWithoutNumbers(designCanvas, webCanvas, regions) {
     const canvas = this.createCanvas(designCanvas.width, designCanvas.height);
     const ctx = canvas.getContext('2d');
 
-    // Create semi-transparent overlay
+    // 创建半透明叠加
     ctx.globalAlpha = 0.5;
     ctx.drawImage(designCanvas, 0, 0);
     ctx.drawImage(webCanvas, 0, 0);
     ctx.globalAlpha = 1.0;
 
-    // Only draw red borders, no numbered circles
+    // 只画红色边框，不画序号圆圈
     regions.forEach((region) => {
       ctx.strokeStyle = 'red';
       ctx.lineWidth = 4;
@@ -581,16 +581,16 @@ class AIInspector {
 
 
   /**
-   * Generate precise problem descriptions based on pixel differences
+   * 生成基于像素差异的精准问题描述
    */
   async generateProblemDescriptions(regionScreenshots) {
-    console.log('🎯 Generating precise problem descriptions based on pixel difference analysis...');
+    console.log('🎯 Generating precise problem descriptions based on pixel differences...');
 
     const descriptions = [];
 
     for (const screenshot of regionScreenshots) {
       try {
-        // Generate descriptions directly based on region features and pixel differences
+        // 直接基于区域特征和像素差异生成描述
         const description = this.generatePreciseDescription(screenshot);
         
         descriptions.push({
@@ -602,7 +602,7 @@ class AIInspector {
       } catch (error) {
         console.error(`Failed to generate description, using fallback solution:`, error);
         
-        // Fallback solution
+        // 备用方案
         const description = this.generateSmartDescription(screenshot);
         descriptions.push({
           regionId: screenshot.regionId,
@@ -616,13 +616,13 @@ class AIInspector {
   }
 
   /**
-   * Call Hugging Face BLIP-2 API (permanently free)
+   * 调用Hugging Face BLIP-2 API（永久免费）
    */
   async callHuggingFaceAPI(screenshot) {
     try {
       console.log('🔗 Calling Hugging Face BLIP-2 API...');
       
-      // Construct UI inspection prompt
+      // 构造中文UI走查专用提示词
       const prompt = this.buildUIInspectionPrompt(screenshot.elementType);
       
       const response = await fetch('https://api-inference.huggingface.co/models/Salesforce/blip2-opt-2.7b', {
@@ -647,7 +647,7 @@ class AIInspector {
       const result = await response.json();
       console.log('✅ Hugging Face API response:', result);
 
-      // Parse API results and format into our required format
+      // 解析API返回的结果并格式化为我们需要的格式
       return this.parseHuggingFaceResponse(result, screenshot);
       
     } catch (error) {
@@ -657,142 +657,142 @@ class AIInspector {
   }
 
   /**
-   * Build UI inspection-specific prompts
+   * 构造UI走查专用提示词
    */
   buildUIInspectionPrompt(elementType) {
     const prompts = {
-      'header': 'Analyze UI issues in this header region, check if height, alignment, and spacing comply with design specifications',
-      'text': 'Analyze issues in this text region, check font size, color, line height, and alignment method',
-      'button': 'Analyze styling issues of this button, check size, border-radius, color, and padding',
-      'icon': 'Analyze display issues of this icon, check size, color, position, and alignment',
-      'navigation': 'Analyze layout issues in this navigation region, check spacing, alignment, and responsive effects',
-      'container': 'Analyze layout issues of this container, check width, padding, background, and borders',
-      'footer': 'Analyze issues in this footer region, check height, content layout, and alignment method',
-      'element': 'Analyze issues of this UI element, check if position, size, and style match the design mockup'
+      'header': '分析这个页头区域的UI问题，检查高度、对齐、间距是否符合设计规范',
+      'text': '分析这个文字区域的问题，检查字体大小、颜色、行高、对齐方式',
+      'button': '分析这个按钮的样式问题，检查尺寸、圆角、颜色、内边距',
+      'icon': '分析这个图标的显示问题，检查大小、颜色、位置、对齐',
+      'navigation': '分析这个导航区域的布局问题，检查间距、对齐、响应式效果',
+      'container': '分析这个容器的布局问题，检查宽度、内边距、背景、边框',
+      'footer': '分析这个页脚区域的问题，检查高度、内容布局、对齐方式',
+      'element': '分析这个UI元素的问题，检查位置、尺寸、样式是否符合设计稿'
     };
 
     const basePrompt = prompts[elementType] || prompts['element'];
-    return `This is a UI inspection screenshot showing a ${elementType} element. ${basePrompt}. Please describe specific issues and modification suggestions.`;
+    return `这是一个UI走查截图，显示了一个${elementType}元素。${basePrompt}。请用中文描述具体问题和修改建议。`;
   }
 
   /**
-   * Parse Hugging Face API response
+   * 解析Hugging Face API响应
    */
   parseHuggingFaceResponse(apiResponse, screenshot) {
     try {
-      // Text description returned by BLIP-2
+      // BLIP-2返回的文本描述
       let description = '';
       if (Array.isArray(apiResponse)) {
         description = apiResponse[0]?.generated_text || '';
       } else if (apiResponse.generated_text) {
         description = apiResponse.generated_text;
       } else {
-        throw new Error('Incorrect API response format');
+        throw new Error('API返回格式不正确');
       }
 
-      // Generate specific problem descriptions and suggestions based on API description and element type
+      // 基于API描述和元素类型生成具体的问题描述和建议
       return this.generateUISpecificDescription(description, screenshot);
       
     } catch (error) {
-      console.error('Failed to parse API response:', error);
-      // Use smart fallback when parsing fails
+      console.error('解析API响应失败:', error);
+      // 解析失败时使用智能备用方案
       return this.generateSmartDescription(screenshot);
     }
   }
 
   /**
-   * Generate precise descriptions based on actual differences
+   * 生成基于实际差异的精准描述
    */
   generatePreciseDescription(screenshot) {
     const elementType = screenshot.elementType;
     const bounds = screenshot.bounds;
     const diff = screenshot.diffAnalysis || {};
     
-    // Determine page region based on region position
+    // 基于区域位置判断页面区域
     const position = this.getPagePosition(bounds);
     
-    // Difference severity level
+    // 差异严重程度
     const severity = diff.severity || 'minor';
     const severityText = severity === 'critical' ? 'significant' : severity === 'medium' ? 'obvious' : 'minor';
     
-    // Generate accurate descriptions based on element type, difference characteristics, and actual dimensions
+    // 基于元素类型、差异特征和实际尺寸生成准确描述
     let title = '';
     let suggestion = '';
     
     switch (elementType) {
       case 'text':
         if (diff.isWideElement) {
-          title = `${position} long text region has ${severityText} differences from design mockup, possibly involving line breaks, alignment or character spacing issues`;
-          suggestion = `Check text-align alignment method, adjust letter-spacing and word-spacing, ensure text width is controlled within ${Math.round(bounds.width * 0.9)}px`;
+          title = `Long text area in ${position} has ${severityText} differences from design mockup, may involve line breaks, alignment or letter spacing issues`;
+          suggestion = `Check text-align alignment, adjust letter-spacing and word-spacing, ensure text width is controlled within ${Math.round(bounds.width * 0.9)}px`;
         } else {
-          title = `${position} text region has ${severityText} differences from design mockup, font size or line height may be inconsistent`;
-          suggestion = `Recommend adjusting font-size to ${Math.max(12, Math.round(bounds.height * 0.8))}px, set line-height to ${(bounds.height * 1.2).toFixed(1)}px`;
+          title = `Text area in ${position} has ${severityText} differences from design mockup, font size or line height may be inconsistent`;
+          suggestion = `Recommend adjusting font-size to ${Math.max(12, Math.round(bounds.height * 0.8))}px, line-height to ${(bounds.height * 1.2).toFixed(1)}px`;
         }
         break;
         
       case 'button':
         if (diff.isWideElement) {
-          title = `${position} wide button styling has ${severityText} differences from design mockup, width-height ratio is unbalanced`;
-          suggestion = `Adjust button max-width to ${Math.round(bounds.width * 0.75)}px, increase vertical padding value to improve ratio`;
+          title = `Wide button style in ${position} has ${severityText} differences from design mockup, aspect ratio is uncoordinated`;
+          suggestion = `Adjust button max-width to ${Math.round(bounds.width * 0.75)}px, increase vertical padding to improve proportion`;
         } else if (diff.isSmallIcon) {
-          title = `${position} small button size does not match design mockup, possibly too small or lacking padding`;
-          suggestion = `Increase minimum button size to 32×32px, set padding: 8px 12px`;
+          title = `Small button size in ${position} does not match design mockup, may be too small or lack padding`;
+          suggestion = `Increase button minimum size to 32×32px, set padding: 8px 12px`;
         } else {
-          title = `${position} button styling has ${severityText} differences from design mockup, size or border-radius needs adjustment`;
+          title = `Button style in ${position} has ${severityText} differences from design mockup, need to adjust size or border radius`;
           suggestion = `Set button width to ${bounds.width}px, height to ${bounds.height}px, border-radius: ${Math.min(bounds.height/4, 8)}px`;
         }
         break;
         
       case 'icon':
         if (diff.isSmallIcon) {
-          title = `${position} small icon display has ${severityText} differences from design mockup, possibly too small or unclear`;
-          suggestion = `Ensure minimum icon size is 24×24px, use SVG format to ensure clarity`;
+          title = `Small icon display in ${position} has ${severityText} differences from design mockup, may be too small or unclear`;
+          suggestion = `Ensure icon minimum size is 24×24px, use SVG format for clarity`;
         } else {
-          title = `${position} icon size does not match design mockup, displayed too large or distorted`;
-          suggestion = `Adjust icon size to ${Math.min(bounds.width, bounds.height)}×${Math.min(bounds.width, bounds.height)}px, maintain square ratio`;
+          title = `Icon size in ${position} does not match design mockup, displays too large or deformed`;
+          suggestion = `Adjust icon size to ${Math.min(bounds.width, bounds.height)}×${Math.min(bounds.width, bounds.height)}px, maintain square proportion`;
         }
         break;
         
       case 'header':
-        title = `${position} header region layout has ${severityText} differences from design mockup, overall height or content distribution needs adjustment`;
-        suggestion = `Set header fixed height to ${bounds.height}px, use flexbox to ensure content is vertically centered`;
+        title = `Header area layout in ${position} has ${severityText} differences from design mockup, overall height or content distribution needs adjustment`;
+        suggestion = `Set header fixed height to ${bounds.height}px, use flexbox to ensure content vertical center alignment`;
         break;
         
       case 'navigation':
         if (diff.isWideElement) {
-          title = `${position} navigation bar width has ${severityText} differences from design mockup, possibly fills entire container width`;
+          title = `Navigation bar width in ${position} has ${severityText} differences from design mockup, may have filled entire container width`;
           suggestion = `Limit navigation container max-width, increase gap between navigation items to ${Math.round(bounds.width * 0.03)}px`;
         } else {
-          title = `${position} navigation region spacing or alignment does not match design mockup`;
+          title = `Navigation area spacing or alignment in ${position} does not match design mockup`;
           suggestion = `Adjust navigation item spacing to 16px, ensure horizontal center alignment`;
         }
         break;
         
       case 'container':
         if (diff.isLargeArea) {
-          title = `${position} large container region has ${severityText} differences from design mockup, overall layout structure deviation is significant`;
-          suggestion = `Recheck container max-width limit, recommend setting to 1200px, adjust internal element spacing`;
+          title = `Large container area in ${position} has ${severityText} differences from design mockup, overall layout structure has major deviation`;
+          suggestion = `Re-check container max-width limit, recommend setting to 1200px, adjust internal element spacing`;
         } else {
-          title = `${position} container element has ${severityText} differences from design mockup, margins or content arrangement needs optimization`;
-          suggestion = `Adjust container padding to 16px, set margin to auto for centering`;
+          title = `Container element in ${position} has ${severityText} differences from design mockup, margins or content arrangement needs optimization`;
+          suggestion = `Adjust container padding to 16px, margin to auto for centering`;
         }
         break;
         
       case 'footer':
-        title = `${position} footer region height or content layout has ${severityText} differences from design mockup`;
-        suggestion = `Set footer minimum height to ${Math.max(60, bounds.height)}px, use flexbox layout to ensure content is centered`;
+        title = `Footer area height or content layout in ${position} has ${severityText} differences from design mockup`;
+        suggestion = `Set footer minimum height to ${Math.max(60, bounds.height)}px, use flexbox layout to ensure content centering`;
         break;
         
       default:
         if (diff.isLargeArea) {
-          title = `${position} large area region has ${severityText} visual differences from design mockup, possibly involving background or layout issues`;
-          suggestion = `Check this region's background-color, border and overall layout settings`;
+          title = `Large area in ${position} has ${severityText} visual differences from design mockup, may involve background or layout issues`;
+          suggestion = `Check background-color, border and overall layout settings in this area`;
         } else if (diff.isSmallIcon) {
-          title = `${position} small element display is inconsistent with design mockup, possibly too small or missing`;
+          title = `Small element in ${position} displays inconsistently with design mockup, may be too small or missing`;
           suggestion = `Ensure element minimum display size, check visibility and opacity properties`;
         } else {
-          title = `${position} UI element has ${severityText} visual differences from design mockup`;
-          suggestion = `Check this element's position, size and style property settings against the design mockup`;
+          title = `UI element in ${position} has ${severityText} visual differences from design mockup`;
+          suggestion = `Check position, size and style property settings of this element against design mockup`;
         }
     }
     
@@ -800,7 +800,7 @@ class AIInspector {
   }
 
   /**
-   * Get page position description
+   * 获取页面位置描述
    */
   getPagePosition(bounds) {
     const centerY = bounds.y + bounds.height / 2;
@@ -809,92 +809,92 @@ class AIInspector {
     let position = '';
     
     if (centerY < 150) {
-      position = 'Top of page';
+      position = 'page top';
     } else if (centerY > 600) {
-      position = 'Bottom of page';
+      position = 'page bottom';
     } else if (centerY > 200 && centerY < 500) {
       if (centerX < 300) {
-        position = 'Middle-left of page';
+        position = 'page middle-left';
       } else if (centerX > 700) {
-        position = 'Middle-right of page';
+        position = 'page middle-right';
       } else {
-        position = 'Center of page';
+        position = 'page center area';
       }
     } else {
-      position = 'Upper-middle of page';
+      position = 'page middle-upper';
     }
     
     return position;
   }
 
   /**
-   * Generate UI-specific problem descriptions and suggestions based on API description (retained as backup)
+   * 基于API描述生成UI特定问题描述和建议（保留作备用）
    */
   generateUISpecificDescription(apiDescription, screenshot) {
     const elementType = screenshot.elementType;
     const bounds = screenshot.bounds;
     
-    // Analyze key information from API description
-    const hasColorIssue = /color/.test(apiDescription);
-    const hasSizeIssue = /size/.test(apiDescription);
-    const hasPositionIssue = /position|alignment/.test(apiDescription);
-    const hasSpacingIssue = /spacing|padding|margin/.test(apiDescription);
+    // 分析API描述中的关键信息
+    const hasColorIssue = /color|颜色|色彩/.test(apiDescription);
+    const hasSizeIssue = /size|大小|尺寸/.test(apiDescription);
+    const hasPositionIssue = /position|位置|对齐/.test(apiDescription);
+    const hasSpacingIssue = /spacing|间距|padding|margin/.test(apiDescription);
     
-    // Generate specific descriptions based on element type and API analysis results
+    // 根据元素类型和API分析结果生成具体描述
     let title = '';
     let suggestion = '';
     
     switch (elementType) {
       case 'text':
         if (hasColorIssue && hasSizeIssue) {
-          title = `Text region color and font size do not match design mockup, ${apiDescription.substring(0, 50)}...`;
-          suggestion = `Adjust text color value and font size, recommend font-size: ${Math.max(14, bounds.height * 0.6)}px`;
+          title = `文字区域的颜色和字体大小与设计稿不一致，${apiDescription.substring(0, 50)}...`;
+          suggestion = `调整文字颜色值和字体大小，建议font-size: ${Math.max(14, bounds.height * 0.6)}px`;
         } else if (hasColorIssue) {
-          title = `Text color differs from design mockup, display effect does not meet expectations`;
-          suggestion = `Check and modify text color property, ensure consistency with design mockup color values`;
+          title = `文字颜色与设计稿存在差异，显示效果不符合预期`;
+          suggestion = `检查并修改文字color属性，确保与设计稿颜色值一致`;
         } else {
-          title = `Text styling does not match design mockup, possibly involving font, size or line height`;
-          suggestion = `Adjust font-size to ${Math.max(14, bounds.height * 0.6)}px, line-height to ${(bounds.height * 0.8).toFixed(1)}px`;
+          title = `文字样式与设计稿不匹配，可能涉及字体、大小或行高`;
+          suggestion = `调整font-size为${Math.max(14, bounds.height * 0.6)}px，line-height为${(bounds.height * 0.8).toFixed(1)}px`;
         }
         break;
         
       case 'button':
         if (hasColorIssue) {
-          title = `Button background color or border color does not match design mockup, affecting visual consistency`;
-          suggestion = `Modify button's background-color and border-color, ensure consistency with design mockup colors`;
+          title = `按钮背景色或边框颜色与设计稿不符，影响视觉统一性`;
+          suggestion = `修改按钮的background-color和border-color，确保与设计稿颜色一致`;
         } else if (hasSizeIssue) {
-          title = `Button size shows obvious differences from design mockup, width and height need adjustment`;
-          suggestion = `Set button size to ${bounds.width}×${bounds.height}px, adjust padding`;
+          title = `按钮尺寸与设计稿差异明显，需要调整宽高`;
+          suggestion = `设置按钮尺寸为${bounds.width}×${bounds.height}px，调整内边距`;
         } else {
-          title = `Button styling differs from design mockup, visual effects need optimization`;
-          suggestion = `Adjust padding: ${Math.round(bounds.height * 0.25)}px ${Math.round(bounds.width * 0.1)}px, border-radius: ${Math.min(bounds.height * 0.2, 8)}px`;
+          title = `按钮样式与设计稿存在差异，需要优化视觉效果`;
+          suggestion = `调整padding: ${Math.round(bounds.height * 0.25)}px ${Math.round(bounds.width * 0.1)}px，border-radius: ${Math.min(bounds.height * 0.2, 8)}px`;
         }
         break;
         
       case 'icon':
         if (hasSizeIssue) {
-          title = `Icon size does not match design mockup, displayed too large or too small`;
-          suggestion = `Standardize icon size to ${Math.max(24, Math.min(bounds.width, bounds.height))}px`;
+          title = `图标尺寸与设计稿不匹配，显示过大或过小`;
+          suggestion = `统一图标尺寸为${Math.max(24, Math.min(bounds.width, bounds.height))}px`;
         } else if (hasColorIssue) {
-          title = `Icon color or transparency does not match design mockup`;
-          suggestion = `Check icon's fill or color properties, ensure color values match design mockup`;
+          title = `图标颜色或透明度与设计稿不一致`;
+          suggestion = `检查图标的fill或color属性，确保颜色值与设计稿相符`;
         } else {
-          title = `Icon display differs from design mockup, styling needs adjustment`;
-          suggestion = `Check icon's size, color and position, ensure consistency with design mockup`;
+          title = `图标显示与设计稿存在差异，需要调整样式`;
+          suggestion = `检查图标的尺寸、颜色和位置，确保与设计稿一致`;
         }
         break;
         
       default:
-        // Generic handling
+        // 通用处理
         if (hasColorIssue) {
-          title = `${elementType} element color does not match design mockup, needs adjustment`;
-          suggestion = `Check element's color-related CSS properties, ensure consistency with design mockup color values`;
+          title = `${elementType}元素的颜色与设计稿不符，需要调整`;
+          suggestion = `检查元素的颜色相关CSS属性，确保与设计稿颜色值一致`;
         } else if (hasSizeIssue) {
-          title = `${elementType} element size shows significant differences from design mockup`;
-          suggestion = `Adjust element size to appropriate values around ${bounds.width}×${bounds.height}px`;
+          title = `${elementType}元素尺寸与设计稿差异较大`;
+          suggestion = `调整元素尺寸为${bounds.width}×${bounds.height}px附近的合适值`;
         } else {
-          title = `${elementType} element has visual differences from design mockup`;
-          suggestion = `Check this element's style properties against design mockup, make corresponding adjustments`;
+          title = `${elementType}元素与设计稿存在视觉差异`;
+          suggestion = `对照设计稿检查该元素的样式属性，进行相应调整`;
         }
     }
     
@@ -902,7 +902,7 @@ class AIInspector {
   }
 
   /**
-   * Smart description generation (fallback solution)
+   * 智能描述生成（备用方案）
    */
   generateSmartDescription(screenshot) {
     const elementType = screenshot.elementType;
@@ -910,36 +910,36 @@ class AIInspector {
 
     const descriptions = {
       'header': {
-        title: 'Header region layout differs from design mockup, possibly due to inconsistent height or content arrangement',
-        suggestion: `Adjust header container height to ${bounds.height}px, check vertical centering of content`
+        title: 'Page header layout differs from design mockup, possibly inconsistent height or content arrangement',
+        suggestion: `Adjust header container height to ${bounds.height}px, check content vertical center alignment`
       },
       'text': {
-        title: 'Text content styling does not match design mockup, possible font size or line height deviation',
+        title: 'Text content style does not match design mockup, font size or line height may be off',
         suggestion: `Recommend adjusting font-size to ${Math.max(14, bounds.height * 0.6)}px, line-height to ${(bounds.height * 0.8).toFixed(1)}px`
       },
       'button': {
-        title: 'Button styling shows significant difference from design mockup, size, color or border-radius needs adjustment',
+        title: 'Button styling has significant differences from design mockup, need to adjust size, color or border radius',
         suggestion: `Set padding: ${Math.round(bounds.height * 0.25)}px ${Math.round(bounds.width * 0.1)}px, border-radius: ${Math.min(bounds.height * 0.2, 8)}px`
       },
       'icon': {
         title: 'Icon display does not match design mockup, possible size, color or position deviation',
-        suggestion: `Standardize icon size to ${Math.max(24, Math.min(bounds.width, bounds.height))}px, check if color values match design mockup`
+        suggestion: `Unify icon size to ${Math.max(24, Math.min(bounds.width, bounds.height))}px, check if color values match design mockup`
       },
       'navigation': {
-        title: 'Navigation bar elements layout inconsistent with design mockup, spacing or alignment needs adjustment',
+        title: 'Navigation elements layout inconsistent with design mockup, spacing or alignment needs adjustment',
         suggestion: `Check navigation item spacing, recommend setting margin: 0 ${Math.round(bounds.width * 0.02)}px`
       },
       'container': {
-        title: 'Container layout shows significant difference from design mockup, overall structure needs adjustment',
-        suggestion: `Recheck container max-width: ${bounds.width}px, padding: ${Math.round(bounds.height * 0.03)}px`
+        title: 'Page middle-right large container area has significant differences from design mockup, overall layout structure has major deviation',
+        suggestion: `Re-check container max-width: ${bounds.width}px, padding: ${Math.round(bounds.height * 0.03)}px`
       },
       'footer': {
         title: 'Footer area does not match design mockup, height or content layout needs adjustment',
         suggestion: `Adjust footer height to ${bounds.height}px, check content center alignment`
       },
       'element': {
-        title: 'UI element differs from design mockup, position, size or styling needs to be checked',
-        suggestion: `Adjust this element's CSS properties according to design mockup, ensure accurate position and dimensions`
+        title: 'Page bottom button style differs from design mockup, need to adjust size or border radius',
+        suggestion: `Refer to design mockup to adjust this element CSS properties, ensure accurate position and size`
       }
     };
 
@@ -947,18 +947,18 @@ class AIInspector {
   }
 
   /**
-   * Fallback descriptions
+   * 备用描述
    */
   getFallbackDescription(elementType) {
-    return `${elementType} element differs from design mockup, requires further adjustment`;
+    return `${elementType} element differs from design mockup, needs further adjustment`;
   }
 
   getFallbackSuggestion(elementType) {
-    return `Please check the styling settings of this ${elementType} against the design mockup`;
+    return `Please check the style settings of this ${elementType} against design mockup`;
   }
 
   /**
-   * Format into product problem list format
+   * 格式化为产品问题列表格式
    */
   formatToProblemList(regions, screenshots, descriptions) {
     console.log('📋 Formatting problem list...');
@@ -984,7 +984,7 @@ class AIInspector {
   }
 
   /**
-   * Calculate issue severity
+   * 计算问题严重程度
    */
   calculateSeverity(area) {
     if (area > 8000) return 'critical';
@@ -993,7 +993,7 @@ class AIInspector {
   }
 
   /**
-   * Calculate similarity
+   * 计算相似度
    */
   calculateSimilarity(diffMap) {
     const totalPixels = diffMap.length;
@@ -1002,25 +1002,25 @@ class AIInspector {
   }
 
   /**
-   * Create overlay canvas
+   * 创建叠加图canvas
    */
   createOverlayCanvas(designCanvas, webCanvas, regions) {
     const canvas = this.createCanvas(designCanvas.width, designCanvas.height);
     const ctx = canvas.getContext('2d');
 
-    // Create semi-transparent overlay
+    // 创建半透明叠加
     ctx.globalAlpha = 0.5;
     ctx.drawImage(designCanvas, 0, 0);
     ctx.drawImage(webCanvas, 0, 0);
     ctx.globalAlpha = 1.0;
 
-    // Draw red borders
+    // 画红色边框
     regions.forEach((region, index) => {
       ctx.strokeStyle = 'red';
       ctx.lineWidth = 4;
       ctx.strokeRect(region.x, region.y, region.width, region.height);
 
-      // Draw numbered circles
+      // 画编号圆圈
       const centerX = region.x + 15;
       const centerY = region.y + 15;
       
@@ -1039,7 +1039,7 @@ class AIInspector {
     return canvas;
   }
 
-  // === Helper Methods ===
+  // === 辅助方法 ===
 
   createCanvas(width, height) {
     const canvas = document.createElement('canvas');
@@ -1058,5 +1058,5 @@ class AIInspector {
   }
 }
 
-// Export AI Inspector
+// 导出AI走查器
 window.AIInspector = AIInspector;
