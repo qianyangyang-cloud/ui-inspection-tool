@@ -78,28 +78,59 @@ body {
 }
 
 .preview-controls {
-  min-height: 40px;
+  min-height: 60px;
+  height: 60px;
   background-color: #f8f9fa;
   border-bottom: 1px solid #ddd;
   display: flex;
   align-items: center;
-  padding: 8px 15px;
+  padding: 10px 15px;
   gap: 15px;
   flex-wrap: wrap;
+  z-index: 100;
+  position: relative;
 }
 
 .upload-button {
-  padding: 8px 16px;
+  padding: 10px 16px;
   background-color: #28a745;
   color: white;
-  border: none;
+  border: 1px solid #28a745;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  min-height: 36px;
+  white-space: nowrap;
 }
 
 .upload-button:hover {
   background-color: #1e7e34;
+  border-color: #1e7e34;
+}
+
+.ai-review-button {
+  padding: 10px 16px;
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #0056b3;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  min-height: 36px;
+  white-space: nowrap;
+}
+
+.ai-review-button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.ai-review-button:disabled {
+  background-color: #6c757d;
+  border-color: #545b62;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .control-group {
@@ -193,17 +224,17 @@ body {
 
 .resize-handle {
   position: absolute;
-  width: 24px; /* Increase click area */
+  width: 24px; /* 增大点击区域 */
   height: 24px;
   pointer-events: all;
   z-index: 15;
   cursor: pointer;
-  opacity: 0; /* Hide control points */
-  background-color: transparent; /* Can change to semi-transparent for debugging */
+  opacity: 0; /* 隐藏控制点 */
+  background-color: transparent; /* 调试时可以改为半透明色 */
 }
 
 .design-overlay:hover .resize-handle {
-  opacity: 1; /* Show on hover */
+  opacity: 1; /* 悬停时显示 */
 }
 
 .resize-handle::before {
@@ -226,7 +257,7 @@ body {
   transform: translate(-50%, -50%) scale(1.2);
 }
 
-/* Four corner control points */
+/* 四个角的控制点 */
 .resize-handle.nw {
   top: -12px;
   left: -12px;
@@ -251,7 +282,7 @@ body {
   cursor: se-resize;
 }
 
-/* Four edge control points */
+/* 四个边的控制点 */
 .resize-handle.n {
   top: -12px;
   left: 50%;
@@ -360,18 +391,29 @@ body {
 
 .ai-review-button {
   padding: 8px 16px;
-  background-color: #6c757d;
-  color: #adb5bd;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
   border-radius: 4px;
-  cursor: not-allowed;
+  cursor: pointer;
   font-size: 12px;
-  transition: opacity 0.2s ease;
+  transition: all 0.3s ease;
   height: 36px;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
 }
 
-.ai-review-button:hover {
-  opacity: 0.8;
+.ai-review-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.ai-review-button:disabled {
+  background-color: #6c757d;
+  color: #adb5bd;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .issues-list {
@@ -559,7 +601,7 @@ body {
   color: #d63384;
 }
 
-/* Initial page prompt styles */
+/* 初始页面提示样式 */
 .empty-preview-placeholder {
   display: flex;
   align-items: center;
@@ -638,7 +680,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* URL restriction notice styles */
+/* URL限制说明样式 */
 .url-restrictions {
   margin-top: 25px;
   padding: 18px 20px;
@@ -673,7 +715,7 @@ body {
   margin-bottom: 0;
 }
 
-/* Crop modal styles */
+/* 裁剪模态框样式 */
 .crop-modal {
   background-color: white;
   border-radius: 8px;
@@ -745,7 +787,7 @@ body {
   opacity: 0.65;
 }
 
-/* Screenshot tip overlay styles */
+/* 截图提示浮层样式 */
 .screenshot-tip {
   position: fixed;
   top: 80px;
@@ -827,7 +869,7 @@ body {
   }
 }
 
-/* Paste screenshot area in issues list */
+/* 问题列表中的粘贴截图区域 */
 .paste-screenshot-section {
   background: linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 100%);
   border: 2px dashed #2196f3;
@@ -861,4 +903,933 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
   background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+}
+
+/* AI走查相关样式 */
+.ai-modal {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.ai-upload-section {
+  margin-bottom: 24px;
+}
+
+.upload-tabs {
+  margin-bottom: 20px;
+}
+
+.tab-content h4 {
+  color: #495057;
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.upload-description {
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* 拖拽上传区域 */
+.drag-upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.drag-upload-area:hover {
+  border-color: #667eea;
+  background-color: #f3f4ff;
+}
+
+.drag-upload-area.dragging {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f3f4ff 0%, #e8f0ff 100%);
+  transform: scale(1.02);
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+
+.upload-text {
+  color: #495057;
+}
+
+.upload-text > div:first-child {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 4px;
+}
+
+/* 文件夹上传 */
+.folder-upload-section {
+  margin-top: 16px;
+}
+
+.folder-upload {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%);
+  border: 2px dashed #ffb74d;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.folder-upload:hover {
+  border-color: #ff9800;
+  background: linear-gradient(135deg, #ffecb3 0%, #ffd54f 100%);
+  transform: scale(1.02);
+}
+
+.folder-upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #f57c00;
+}
+
+.folder-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.folder-upload-content > div:nth-child(2) {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.folder-hint {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* 已上传文件列表 */
+.uploaded-files {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+}
+
+.uploaded-files h4 {
+  color: #495057;
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.file-preview {
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 8px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.file-preview:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preview-thumbnail {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.file-info {
+  text-align: center;
+}
+
+.file-name {
+  font-size: 11px;
+  color: #495057;
+  font-weight: 500;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-size: 10px;
+  color: #6c757d;
+}
+
+.remove-file {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.remove-file:hover {
+  background: #c82333;
+  transform: scale(1.1);
+}
+
+/* AI技术栈信息 */
+.ai-tech-info {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 100%);
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.ai-tech-info h4 {
+  color: #1976d2;
+  font-size: 16px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.tech-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.tech-item {
+  background-color: white;
+  border: 1px solid #e1f5fe;
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.tech-item:hover {
+  border-color: #81c784;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tech-name {
+  display: block;
+  font-weight: 600;
+  color: #1976d2;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.tech-desc {
+  display: block;
+  font-size: 11px;
+  color: #4caf50;
+  line-height: 1.3;
+}
+
+/* AI处理进度 */
+.ai-processing {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.processing-header {
+  margin-bottom: 30px;
+}
+
+.processing-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.processing-header h4 {
+  color: #495057;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.progress-container {
+  margin-bottom: 30px;
+}
+
+.progress-bar {
+  background-color: #e9ecef;
+  border-radius: 10px;
+  height: 20px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    90deg, 
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-text {
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.progress-percentage {
+  color: #6c757d;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.processing-info {
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.processing-info p {
+  margin-bottom: 8px;
+}
+
+.processing-info p:last-child {
+  margin-bottom: 0;
+}
+
+/* AI生成的问题项样式 */
+.issue-item.ai-generated {
+  border-left: 4px solid #667eea;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 100%);
+  position: relative;
+}
+
+.ai-badge {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 0 4px 0 8px;
+  font-size: 10px;
+  font-weight: 600;
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .ai-modal {
+    width: 95%;
+    padding: 16px;
+    max-height: 95vh;
+  }
+  
+  .tech-stack {
+    grid-template-columns: 1fr;
+  }
+  
+  .files-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  
+  .drag-upload-area {
+    padding: 30px 15px;
+  }
+  
+  .upload-icon {
+    font-size: 36px;
+  }
+}
+
+/* 图片放大显示模态框 */
+.image-enlargement-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.image-enlargement-container {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: enlargeIn 0.3s ease-out;
+}
+
+@keyframes enlargeIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.image-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+  transition: background 0.2s;
+}
+
+.image-close-button:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.enlarged-image {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.image-enlargement-tip {
+  padding: 10px 15px;
+  background: #f5f5f5;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+}
+
+/* 增强问题列表截图样式 */
+.issue-screenshot {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 4px;
+}
+
+.issue-screenshot:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 增强模态框截图样式 */
+.modal-screenshot {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 4px;
+}
+
+.modal-screenshot:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 多页面走查模式样式 */
+.multi-page-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 20px;
+}
+
+.mode-toggle-button {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-toggle-button:hover {
+  background: #e9ecef;
+}
+
+.mode-toggle-button.active {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+.capture-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.capture-button:hover {
+  background: #0056b3;
+}
+
+.capture-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.force-detect-button {
+  background: #ffc107;
+  color: #212529;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.force-detect-button:hover {
+  background: #e0a800;
+}
+
+.force-detect-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  color: white;
+}
+
+.page-count-info {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* 页面切换通知 */
+.page-change-notification {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background: #007bff;
+  color: white;
+  border-radius: 6px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  z-index: 1000;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notification-icon {
+  font-size: 16px;
+}
+
+.notification-text {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* 多页面信息面板 */
+.multi-page-info-panel {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  max-height: 300px;
+  overflow: hidden;
+}
+
+.info-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.info-panel-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.batch-ai-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.batch-ai-button:hover {
+  background: #218838;
+}
+
+.batch-ai-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.panel-toggle {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.panel-toggle:hover {
+  background: #e9ecef;
+}
+
+.pages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.page-card {
+  display: flex;
+  gap: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid #e9ecef;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.page-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.page-thumbnail {
+  flex-shrink: 0;
+  width: 60px;
+  height: 45px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #dee2e6;
+}
+
+.page-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.page-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-url {
+  font-size: 10px;
+  color: #6c757d;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-type {
+  font-size: 10px;
+  color: #495057;
+  margin-bottom: 4px;
+}
+
+.match-info {
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.match-info.success {
+  color: #28a745;
+}
+
+.match-info.no-match {
+  color: #dc3545;
+}
+
+.page-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.mini-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mini-button:hover {
+  background: #0056b3;
+}
+
+.mini-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* 问题列表中的页面信息标签 */
+.page-info-tag, .matched-design-tag {
+  font-size: 11px;
+  color: #6c757d;
+  margin-top: 4px;
+  padding: 2px 6px;
+  background: #f8f9fa;
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.page-info-tag {
+  border-left: 3px solid #007bff;
+}
+
+.matched-design-tag {
+  border-left: 3px solid #28a745;
+}
+
+/* 视频教程样式 */
+.video-tutorial-section {
+  text-align: center;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.video-tutorial-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #ffffff;
+  color: #667eea;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.video-tutorial-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background: #f8f9ff;
+}
+
+.tutorial-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.tutorial-desc {
+  color: #ffffff !important;
+  font-size: 14px;
+  margin-top: 12px;
+  opacity: 1 !important;
+}
+
+/* 视频教程模态框 */
+.video-tutorial-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.video-tutorial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+  background: #f8f9fa;
+}
+
+.video-tutorial-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.video-tutorial-content {
+  padding: 24px;
+}
+
+.video-description {
+  margin-top: 16px;
+  color: #666;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.video-tutorial-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+  text-align: center;
+  background: #f8f9fa;
 }
