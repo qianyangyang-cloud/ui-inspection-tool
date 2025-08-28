@@ -621,7 +621,7 @@ function App() {
       }
     }
     
-    // 只有当匹配分数超过阈值时才认为匹配成功
+    // A match is considered successful only when the matching score exceeds the threshold
     if (highestScore > 0.3) {
       setDesignImageMatching(prev => ({
         ...prev,
@@ -636,7 +636,7 @@ function App() {
     return null;
   };
 
-  // 计算匹配分数
+  // Calculating the matching score
   const calculateMatchScore = (pageInfo, designImage) => {
     let score = 0;
     const fileName = designImage.name.toLowerCase();
@@ -645,12 +645,12 @@ function App() {
     const pathname = pageInfo.pathname.toLowerCase();
     const mainHeading = pageInfo.mainHeading.toLowerCase();
     
-    // 1. 文件名与页面类型匹配 (30%)
+    // 1. The file name matches the page type (30%)
     if (fileName.includes(pageType)) {
       score += 0.3;
     }
     
-    // 2. 文件名与路径匹配 (25%)
+    // 2. File name and path matching (25%)
     const pathSegments = pathname.split('/').filter(seg => seg.length > 0);
     for (const segment of pathSegments) {
       if (fileName.includes(segment)) {
@@ -659,7 +659,7 @@ function App() {
       }
     }
     
-    // 3. 文件名与页面标题匹配 (20%)
+    // 3. The file name matches the page title (20%)
     const titleWords = pageTitle.split(' ').filter(word => word.length > 2);
     for (const word of titleWords) {
       if (fileName.includes(word)) {
@@ -668,7 +668,7 @@ function App() {
       }
     }
     
-    // 4. 文件名与主标题匹配 (15%)
+    // 4. The file name matches the main title (15%)
     if (mainHeading) {
       const headingWords = mainHeading.split(' ').filter(word => word.length > 2);
       for (const word of headingWords) {
@@ -679,7 +679,7 @@ function App() {
       }
     }
     
-    // 5. 特殊关键词匹配 (10%)
+    // 5. Special keyword matching (10%)
     const specialKeywords = ['login', 'dashboard', 'home', 'profile', 'settings', 'about', 'contact'];
     for (const keyword of specialKeywords) {
       if (fileName.includes(keyword) && (pageType.includes(keyword) || pathname.includes(keyword) || pageTitle.includes(keyword))) {
@@ -691,7 +691,7 @@ function App() {
     return Math.min(1, score); // 限制最大值为1
   };
 
-  // 生成匹配原因说明
+  // Generate a matching reason description
   const generateMatchReasons = (pageInfo, designImage, score) => {
     const reasons = [];
     const fileName = designImage.name.toLowerCase();
@@ -700,19 +700,19 @@ function App() {
     const pathname = pageInfo.pathname.toLowerCase();
     
     if (fileName.includes(pageType)) {
-      reasons.push(`文件名包含页面类型 "${pageType}"`);
+      reasons.push(`The file name contains the page type "${pageType}"`);
     }
     
     const pathSegments = pathname.split('/').filter(seg => seg.length > 0);
     for (const segment of pathSegments) {
       if (fileName.includes(segment)) {
-        reasons.push(`文件名匹配路径 "${segment}"`);
+        reasons.push(`Filename matching path "${segment}"`);
         break;
       }
     }
     
     if (reasons.length === 0) {
-      reasons.push('基于文件名与页面信息的相似度');
+      reasons.push('Based on the similarity between file name and page information');
     }
     
     return reasons;
@@ -738,7 +738,7 @@ function App() {
 
   const loadUrl = () => {
     if (url.trim()) {
-      // 检测是否为本地地址
+      // Check if it is a local address
       if (isLocalhostUrl(url.trim())) {
         alert('❌ Web version does not support local addresses (localhost/internal IP)\n\nRecommendations:\n1. Deploy the website to a public address\n2. Use desktop version or browser extension\n3. Upload page screenshots for comparison');
         return;
@@ -807,7 +807,7 @@ function App() {
       // Simulate AI inspection process
       const aiIssues = await simulateAIInspectionForPage(pageData, matchInfo);
       
-      // 将问题添加到问题列表
+      // Adding a question to the question list
       setIssues(prev => [
         ...prev,
         ...aiIssues.map(issue => ({
@@ -817,7 +817,7 @@ function App() {
         }))
       ]);
       
-      setAiProgress({ step: `页面 "${pageData.pageInfo.title}" AI走查完成，发现${aiIssues.length}个问题`, progress: 100 });
+      setAiProgress({ step: `page "${pageData.pageInfo.title}" AI walkthrough completed, ${aiIssues.length}issues found`, progress: 100 });
       
       setTimeout(() => {
         setIsAIProcessing(false);
@@ -825,52 +825,52 @@ function App() {
       }, 2000);
       
     } catch (error) {
-      console.error('AI走查错误:', error);
+      console.error('AI walkthrough errors:', error);
       setIsAIProcessing(false);
       setAiProgress({ step: '', progress: 0 });
       alert('AI inspection failed, please try again later');
     }
   };
 
-  // 模拟AI走查单个页面
+  // Simulate AI to check a single page
   const simulateAIInspectionForPage = async (pageData, matchInfo) => {
-    // 模拟延迟
+    // Analog Delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // 根据页面类型生成不同的问题
+    // Generate different questions based on page type
     const pageType = pageData.pageInfo.pageType;
     const mockIssues = [];
     
-    // 根据页面类型生成对应的问题
+    // Generate corresponding questions based on page type
     switch (pageType) {
       case 'login':
         mockIssues.push({
           id: Date.now() + Math.random(),
           screenshot: pageData.screenshot,
-          description: `登录表单输入框间距与设计稿不一致，实际间距为12px，设计要求16px`,
-          suggestion: '调整输入框的margin-bottom为16px',
-          status: '未验收',
-          source: 'AI走查'
+          description: `The spacing between the input boxes in the login form is inconsistent with the design draft. The actual spacing is 12px, while the design requires 16px.`,
+          suggestion: 'Adjust the margin-bottom of the input box to 16px',
+          status: 'Not accepted',
+          source: 'AI Walkthrough'
         });
         break;
       case 'dashboard':
         mockIssues.push({
           id: Date.now() + Math.random(),
           screenshot: pageData.screenshot,
-          description: `仪表板卡片阴影效果与设计稿差异较大，实际为box-shadow: 0 2px 4px，设计要求: 0 4px 8px`,
-          suggestion: '修改卡片的box-shadow为0 4px 8px rgba(0,0,0,0.1)',
-          status: '未验收',
-          source: 'AI走查'
+          description: `The shadow effect of the dashboard card is quite different from the design draft. The actual box-shadow is: 0 2px 4px, and the design requirement is: 0 4px 8px`,
+          suggestion: 'Modify the card's box-shadow to 0 4px 8px rgba(0,0,0,0.1)',
+          status: 'Not accepted',
+          source: 'AI Walkthrough'
         });
         break;
       default:
         mockIssues.push({
           id: Date.now() + Math.random(),
           screenshot: pageData.screenshot,
-          description: `页面内容与设计稿存在微小差异，可能涉及字体、间距或颜色等方面`,
-          suggestion: '请对照设计稿仔细检查页面细节并调整',
-          status: '未验收',
-          source: 'AI走查'
+          description: `There are slight differences between the page content and the design draft, which may involve fonts, spacing or colors.`,
+          suggestion: 'Please check the page details carefully and adjust them according to the design draft',
+          status: 'Not accepted',
+          source: 'AI Walkthrough'
         });
         break;
     }
@@ -878,7 +878,7 @@ function App() {
     return mockIssues;
   };
 
-  // 批量AI走查所有页面
+  // Batch AI check all pages
   const handleBatchAIInspection = async () => {
     const pagesWithMatches = Object.entries(pageScreenshots)
       .filter(([pageKey]) => designImageMatching[pageKey])
@@ -905,7 +905,7 @@ function App() {
         const { pageKey, pageData, matchInfo } = pagesWithMatches[i];
         
         setAiProgress({
-          step: `正在检查页面 ${i + 1}/${pagesWithMatches.length}: "${pageData.pageInfo.title}"`,
+          step: `Checking page ${i + 1}/${pagesWithMatches.length}: "${pageData.pageInfo.title}"`,
           progress: ((i + 1) / pagesWithMatches.length) * 90
         });
 
@@ -919,17 +919,17 @@ function App() {
           }))
         ];
 
-        // 避免过于频繁的请求
+        // Avoid too frequent requests
         if (i < pagesWithMatches.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
 
-      // 将所有问题添加到问题列表
+      // Add all questions to the question list
       setIssues(prev => [...prev, ...totalIssues]);
       
       setAiProgress({
-        step: `批量AI走查完成！共检查${pagesWithMatches.length}个页面，发现${totalIssues.length}个问题`,
+        step: `Batch AI walkthrough completed!A total of${pagesWithMatches.length}pages were checked,${totalIssues.length}issues found`,
         progress: 100
       });
 
@@ -939,7 +939,7 @@ function App() {
       }, 3000);
 
     } catch (error) {
-      console.error('批量AI走查错误:', error);
+      console.error('Batch AI walkthrough errors:', error);
       setIsAIProcessing(false);
       setAiProgress({ step: '', progress: 0 });
       alert('Batch AI inspection failed, please try again later');
@@ -964,7 +964,7 @@ function App() {
 
 
 
-  // 切换设计尺寸
+  // Switch design size
   const handleDesignSizeChange = (event) => {
     const selectedIndex = event.target.value;
     const selectedPreset = designSizePresets[selectedIndex];
@@ -974,11 +974,11 @@ function App() {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // 检查文件大小 (10MB = 10 * 1024 * 1024 bytes)
+      // Check file size (10MB = 10 * 1024 * 1024 bytes)
       const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
         alert(`Image file too large (${(file.size / 1024 / 1024).toFixed(1)}MB), please select an image smaller than 10MB`);
-        event.target.value = ''; // 清除文件选择
+        event.target.value = ''; // Clear file selection
         return;
       }
 
@@ -988,13 +988,13 @@ function App() {
         img.onload = () => {
           setDesignImage(e.target.result);
           
-          // 设置初始尺寸
+          // Set the initial size
           const maxWidth = 500;
           const maxHeight = 400;
           let width = img.width;
           let height = img.height;
           
-          // 如果图片太大，按比例缩小
+          // If the image is too large, scale it down
           if (width > maxWidth || height > maxHeight) {
             const scaleX = maxWidth / width;
             const scaleY = maxHeight / height;
@@ -1028,13 +1028,13 @@ function App() {
   };
 
   const handleImageMouseDown = (e) => {
-    // 检查是否点击在resize handle上
+    // Check if the click is on the resize handle
     if (e.target.classList.contains('resize-handle') || 
         e.target.closest('.resize-handle')) {
-      return; // 避免和缩放冲突
+      return; // Avoiding scaling conflicts
     }
     
-    // 确保点击的是图片本身或图片容器
+    // Make sure you click on the image itself or the image container
     if (!e.target.classList.contains('design-image') && 
         !e.target.classList.contains('design-overlay')) {
       return;
@@ -1043,7 +1043,7 @@ function App() {
     e.preventDefault();
     e.stopPropagation();
     
-    // 添加更严格的状态检查
+    // Add stricter status checks
     if (isResizing || isSelecting) {
       return;
     }
@@ -1059,17 +1059,17 @@ function App() {
     e.preventDefault();
     e.stopPropagation();
     
-    // 只阻止选择模式，允许在拖拽时切换到缩放
+    // Prevents only selection mode, allowing switching to zoom while dragging
     if (isSelecting) {
       return;
     }
     
-    // 清理其他状态
+    // Cleaning up other states
     setIsDragging(false);
     setDragStart(null);
     setIsResizing(true);
     
-    // 设置transform-origin根据方向
+    // Set transform-origin according to direction
     let origin = 'center center';
     switch (direction) {
       case 'nw': origin = 'bottom right'; break;
@@ -1092,7 +1092,7 @@ function App() {
   };
 
   const handleMouseMove = useCallback((e) => {
-    // 直接处理拖拽
+    // Handle dragging directly
     if (isDragging && dragStart) {
       const newX = e.clientX - dragStart.x;
       const newY = e.clientY - dragStart.y;
@@ -1100,7 +1100,7 @@ function App() {
       return;
     }
 
-    // 直接处理选择
+    // Direct processing selection
     if (isSelecting && selectionStart) {
       const rect = previewRef.current?.getBoundingClientRect();
       if (rect) {
@@ -1118,66 +1118,66 @@ function App() {
     }
 
 
-    // 使用transform缩放处理
+    // Use transform scaling
     if (isResizing && resizeStart) {
       const deltaX = e.clientX - resizeStart.x;
       const deltaY = e.clientY - resizeStart.y;
       
-      // 根据拖拽方向计算缩放增量 - 提高灵敏度
+      // Calculate zoom increments based on drag direction - Increase sensitivity
       let scaleChange = 0;
-      const sensitivity = 100; // 降低数值提高灵敏度
+      const sensitivity = 100; // Lower the value to increase sensitivity
       
       switch (resizeStart.direction) {
-        case 'se': // 右下角 - 向右下拖拽放大
+        case 'se': // Lower right corner - drag to the lower right to zoom in
           scaleChange = Math.max(deltaX, deltaY) / sensitivity;
           break;
-        case 'nw': // 左上角 - 向左上拖拽放大
+        case 'nw': // Upper left corner - Drag to the upper left to zoom in
           scaleChange = Math.max(-deltaX, -deltaY) / sensitivity;
           break;
-        case 'ne': // 右上角 - 向右上拖拽放大
+        case 'ne': // Upper right corner - Drag to the upper right to zoom in
           scaleChange = Math.max(deltaX, -deltaY) / sensitivity;
           break;
-        case 'sw': // 左下角 - 向左下拖拽放大
+        case 'sw': // Lower left corner - Drag to the lower left to zoom in
           scaleChange = Math.max(-deltaX, deltaY) / sensitivity;
           break;
-        case 'e': // 右边 - 向右拖拽放大
+        case 'e': // Right - Drag right to zoom in
           scaleChange = deltaX / sensitivity;
           break;
-        case 'w': // 左边 - 向左拖拽放大
+        case 'w': // Left - Drag left to zoom in
           scaleChange = -deltaX / sensitivity;
           break;
-        case 's': // 下边 - 向下拖拽放大
+        case 's': // Bottom - Drag down to zoom in
           scaleChange = deltaY / sensitivity;
           break;
-        case 'n': // 上边 - 向上拖拽放大
+        case 'n': // Top - Drag upwards to zoom in
           scaleChange = -deltaY / sensitivity;
           break;
       }
       
-      // 计算新的缩放值，增加更大的范围
+      // Calculate new zoom values, adding a larger range
       const newScale = Math.max(0.1, Math.min(10, resizeStart.startScale + scaleChange));
       setImageScale(newScale);
     }
   }, [isDragging, dragStart, isResizing, resizeStart, isSelecting, selectionStart]);
 
   const handleMouseUp = useCallback(async () => {
-    // 保存当前状态
+    // Save the current state
     const wasDragging = isDragging;
     const wasResizing = isResizing;
     const wasSelecting = isSelecting;
     
-    // 立即清理所有状态，防止状态残留
+    // Clean up all states immediately to prevent any residual states.
     setIsDragging(false);
     setIsResizing(false);
     setDragStart(null);
     setResizeStart(null);
     
     if (wasResizing) {
-      // 缩放结束后重置transform-origin
+      // Reset transform-origin after scaling
       setTimeout(() => setImageTransformOrigin('center center'), 50);
     }
     
-    // 框选完成后不做任何处理，等待用户点击按钮
+    // After the selection is completed, no processing is done and wait for the user to click the button
     if (wasSelecting && selection && selection.width > 10 && selection.height > 10) {
       setIsSelecting(false);
     }
@@ -1194,7 +1194,7 @@ function App() {
         handleMouseUp(e);
       };
       
-      // 添加全局事件监听，包括window事件
+      // Add global event monitoring, including window events
       document.addEventListener('mousemove', handleGlobalMouseMove);
       document.addEventListener('mouseup', handleGlobalMouseUp);
       window.addEventListener('blur', handleGlobalMouseUp); // 窗口失焦时清理
@@ -1209,17 +1209,17 @@ function App() {
     }
   }, [isDragging, isResizing, isSelecting, handleMouseMove, handleMouseUp]);
 
-  // 监听框选完成，显示截图提示
+  // The monitoring box selection is completed and the screenshot prompt is displayed
   React.useEffect(() => {
     if (!isSelecting && selection && selection.width > 10 && selection.height > 10) {
-      // 框选完成后，显示截图提示
+      // After the selection is completed, the screenshot prompt is displayed
       setShowScreenshotTip(true);
-      // 高亮显示预览区域（红框一直显示）
+      // Highlight the preview area (the red frame is always displayed)
       if (previewRef.current) {
         previewRef.current.style.boxShadow = '0 0 0 4px #ff0000';
         previewRef.current.style.transition = 'box-shadow 0.3s ease';
       }
-      // 不自动隐藏提示，让用户主动操作
+      // Do not automatically hide prompts, let users take the initiative to operate
     }
   }, [isSelecting, selection]);
 
@@ -1285,7 +1285,7 @@ function App() {
       alert('No image found in clipboard, please take a screenshot using Win+Shift+S first');
       
     } catch (error) {
-      console.error('读取剪贴板失败:', error);
+      console.error('Failed to read clipboard:', error);
       alert('Cannot access clipboard, please take a screenshot with Win+Shift+S and try again');
     }
   };
@@ -1299,16 +1299,16 @@ function App() {
 
   // AI走查相关函数 - 简化为单文件上传
   const handleAIImageUpload = (files) => {
-    console.log('handleAIImageUpload 被调用，文件数量:', files.length);
+    console.log('handleAIImageUpload is called with the number of files: ', files.length);
     
     if (!files || files.length === 0) {
-      console.log('没有选择文件');
+      console.log('No file selected');
       return;
     }
 
     // 只处理第一个文件
     const file = files[0];
-    console.log('处理设计图文件:', file.name, file.type, file.size);
+    console.log('Processing design drawing files:', file.name, file.type, file.size);
     
     // 检查文件类型
     if (!['image/png', 'image/jpg', 'image/jpeg'].includes(file.type)) {
@@ -1325,7 +1325,7 @@ function App() {
     // 读取文件
     const reader = new FileReader();
     reader.onload = (e) => {
-      console.log(`设计图 ${file.name} 读取成功`);
+      console.log(`Design drawing ${file.name} read successfully`);
       
       const imageData = {
         name: file.name,
@@ -1335,11 +1335,11 @@ function App() {
 
       // 替换而不是追加
       setAiUploadedImages([imageData]);
-      console.log('设置AI设计图:', imageData.name);
+      console.log('Setting up AI blueprint:', imageData.name);
     };
     
     reader.onerror = (error) => {
-      console.error(`读取设计图失败:`, error);
+      console.error(`Failed to read the design drawing:`, error);
       alert(`Failed to read design image`);
     };
     
@@ -1404,13 +1404,13 @@ function App() {
     }
 
     setIsAIProcessing(true);
-    setAiProgress({ step: '准备AI走查...', progress: 10 });
+    setAiProgress({ step: 'Prepare for AI walkthrough...', progress: 10 });
 
     try {
       // Simulate AI inspection process
       await simulateAIInspection();
     } catch (error) {
-      console.error('AI走查失败:', error);
+      console.error('AI walkthrough failed:', error);
       alert('AI inspection failed, please try again');
     } finally {
       setIsAIProcessing(false);
@@ -1433,7 +1433,7 @@ function App() {
       setAiProgress({ step: '', progress: 35 });
       
       if (aiUploadedImages.length === 0) {
-        throw new Error('请先上传设计图');
+        throw new Error('Please upload the design first图');
       }
       
       // 步骤4：UI元素分类
@@ -1463,8 +1463,8 @@ function App() {
         screenshot: region.screenshot,
         description: region.description,
         suggestion: region.suggestion,
-        status: '未验收',
-        source: 'AI走查',
+        status: 'Not accepted',
+        source: 'AI Walkthrough',
         elementType: region.elementType,
         confidence: region.confidence,
         severity: region.severity
@@ -1474,15 +1474,15 @@ function App() {
       setIssues(prev => [...prev, ...aiGeneratedIssues]);
       
       const message = inspectionResult.regions.length > 0 
-        ? `AI走查完成！发现 ${aiGeneratedIssues.length} 个差异问题` 
-        : '页面与设计稿高度一致，未发现显著差异';
+        ? `AI walkthrough complete! ${aiGeneratedIssues.length} discrepancies found` 
+        : 'The page is highly consistent with the design draft, and no significant differences were found.';
         
       setAiProgress({ step: message, progress: 100 });
       await new Promise(resolve => setTimeout(resolve, 1500));
       
     } catch (error) {
-      console.error('AI走查失败:', error);
-      setAiProgress({ step: `走查失败：${error.message}`, progress: 0 });
+      console.error('AI walkthrough failed:', error);
+      setAiProgress({ step: `Walkthrough failed:${error.message}`, progress: 0 });
       await new Promise(resolve => setTimeout(resolve, 2000));
       throw error;
     }
@@ -1491,11 +1491,11 @@ function App() {
   // 1. 捕获iframe内容的真实截图
   const captureIframeContent = async () => {
     try {
-      console.log('开始捕获iframe内容...');
+      console.log('Starting to capture iframe content...');
       
       // 方法1：尝试直接截图iframe
       if (iframeRef.current) {
-        console.log('找到iframe元素，尺寸:', iframeRef.current.offsetWidth, 'x', iframeRef.current.offsetHeight);
+        console.log('Find the iframe element, size:', iframeRef.current.offsetWidth, 'x', iframeRef.current.offsetHeight);
         
         // 等待iframe完全加载
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -1504,7 +1504,7 @@ function App() {
         try {
           const iframeDoc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
           if (iframeDoc) {
-            console.log('✅ 成功访问iframe内容，直接截图');
+            console.log('✅ Successfully access the iframe content and take a screenshot directly');
             // 能访问iframe内容，直接截图
             const canvas = await html2canvas(iframeDoc.body, {
               useCORS: true,
@@ -1513,26 +1513,26 @@ function App() {
               width: iframeRef.current.offsetWidth,
               height: iframeRef.current.offsetHeight
             });
-            console.log('📸 iframe内容截图成功，canvas尺寸:', canvas.width, 'x', canvas.height);
+            console.log('📸The iframe content screenshot was successful, canvas size:', canvas.width, 'x', canvas.height);
             return canvas;
           }
         } catch (e) {
-          console.log('⚠️ 跨域iframe，使用外层截图方案:', e.message);
+          console.log('⚠️ Cross-domain iframe, using outer screenshot solution:', e.message);
         }
         
         // 方法2：截图包含iframe的容器
-        console.log('📷 使用外层截图方案...');
+        console.log('📷 Using the outer screenshot solution...');
         const canvas = await html2canvas(previewRef.current, {
           useCORS: true,
           allowTaint: true,
           scale: 1
         });
-        console.log('📸 外层截图成功，canvas尺寸:', canvas.width, 'x', canvas.height);
+        console.log('📸 The outer layer screenshot is successful, canvas size:', canvas.width, 'x', canvas.height);
         return canvas;
       }
-      throw new Error('未找到iframe元素');
+      throw new Error('iframe element not found');
     } catch (error) {
-      console.error('❌ 截图失败:', error);
+      console.error('❌ Screenshot failed:', error);
       throw error;
     }
   };
@@ -1540,12 +1540,12 @@ function App() {
   // 2. 设计图叠加到网页上 (OpenCLIP + 图片处理)
   const overlayDesignOnWebPage = async (webScreenshot) => {
     try {
-      console.log('开始设计图叠加处理...');
+      console.log('Start design drawing overlay processing...');
       if (aiUploadedImages.length === 0) {
-        console.log('⚠️ 没有上传设计图，跳过叠加处理');
+        console.log('⚠️ No design drawings uploaded, skipping the overlay process');
         return webScreenshot;
       }
-      console.log('✅ 找到设计图，开始叠加处理:', aiUploadedImages[0].name);
+      console.log('✅ Find the design and start overlay processing:', aiUploadedImages[0].name);
       
       await new Promise(resolve => setTimeout(resolve, 1500)); // 模拟AI处理时间
       
@@ -1658,7 +1658,7 @@ function App() {
       
       return differences;
     } catch (error) {
-      console.error('差异检测失败:', error);
+      console.error(Difference detection failed:', error);
       // 如果真实检测失败，返回空数组
       return [];
     }
@@ -1692,7 +1692,7 @@ function App() {
       
       return analyzedDifferences;
     } catch (error) {
-      console.error('像素差异检测失败:', error);
+      console.error('Pixel difference detection failed:', error);
       return [];
     }
   };
@@ -2043,11 +2043,11 @@ function App() {
       }
     }
     
-    console.log(`初步聚类得到 ${regions.length} 个区域`);
+    console.log(`Preliminary clustering results in ${regions.length} regions`);
     
     // 后处理：合并过于接近的区域
     const mergedRegions = mergeNearbyRegions(regions);
-    console.log(`合并后保留 ${mergedRegions.length} 个区域`);
+    console.log(`${mergedRegions.length} regions will remain after merging`);
     return mergedRegions;
   };
 
@@ -2055,7 +2055,7 @@ function App() {
   const analyzeDifferenceRegions = async (regions, webData, overlaidData) => {
     const analyzedDifferences = [];
     
-    console.log(`开始分析 ${regions.length} 个差异区域...`);
+    console.log(`Starting analysis of ${regions.length} diff regions...`);
     
     for (const region of regions) {
       const width = region.maxX - region.minX + 1;
@@ -2099,7 +2099,7 @@ function App() {
     
     // 输出详细信息用于调试
     sortedDifferences.forEach((diff, index) => {
-      console.log(`差异 ${index + 1}: ${diff.type} (${diff.width}×${diff.height}px, 置信度: ${(diff.confidence * 100).toFixed(1)}%, 强度: ${diff.averageDifference.toFixed(1)})`);
+      console.log(`difference ${index + 1}: ${diff.type} (${diff.width}×${diff.height}px, Confidence: ${(diff.confidence * 100).toFixed(1)}%, 强度: ${diff.averageDifference.toFixed(1)})`);
     });
     
     return sortedDifferences;
@@ -2296,7 +2296,7 @@ function App() {
       
       return textAnalysis;
     } catch (error) {
-      console.error('文字识别失败:', error);
+      console.error('Text recognition failed:', error);
       return segmentedElements;
     }
   };
@@ -2304,7 +2304,7 @@ function App() {
   // 6. 生成真实的AI问题报告 (基于实际图像对比)
   const generateRealAIIssues = async (overlaidScreenshot, differences, textAnalysis) => {
     try {
-      console.log('开始生成AI问题报告，输入参数:', {
+      console.log('Start generating AI problem report, enter parameters:', {
         overlaidScreenshot: overlaidScreenshot ? 'OK' : 'NULL',
         differencesLength: differences ? differences.length : 0,
         textAnalysisLength: textAnalysis ? textAnalysis.length : 0
@@ -2315,14 +2315,14 @@ function App() {
       const issues = [];
       
       if (!differences || differences.length === 0) {
-        console.warn('⚠️ differences 为空或未定义');
+        console.warn('⚠️ differences is empty or undefined');
         return [];
       }
       
       // 使用真实的差异检测结果生成问题
       for (let i = 0; i < differences.length && i < 10; i++) {
         const diff = differences[i];
-        console.log(`处理差异 ${i + 1}:`, diff);
+        console.log(`Dealing with differences ${i + 1}:`, diff);
         
         try {
           // 为每个差异区域创建带标记的截图
@@ -2333,23 +2333,23 @@ function App() {
             screenshot: markedScreenshot,
             description: generateSpecificDescription(diff),
             suggestion: generateSpecificSuggestion(diff),
-            status: '未验收',
-            source: 'AI走查',
+            status: 'Not accepted',
+            source: 'AI Walkthrough',
             confidence: diff.confidence,
             elementType: diff.type
           };
           
           issues.push(issue);
-          console.log(`生成问题 ${i + 1}:`, issue.description);
+          console.log(`Generate questions ${i + 1}:`, issue.description);
         } catch (error) {
-          console.error(`生成第 ${i + 1} 个问题失败:`, error);
+          console.error(`Failed to generate question ${i + 1}:`, error);
         }
       }
       
-      console.log(`✅ 成功生成 ${issues.length} 个AI问题`);
+      console.log(`✅ Successfully generated ${issues.length} AI issues`);
       return issues;
     } catch (error) {
-      console.error('生成AI问题报告失败:', error);
+      console.error('Failed to generate AI problem report:', error);
       return [];
     }
   };
@@ -2379,45 +2379,45 @@ function App() {
     let position = '';
     let detailedLocation = '';
     if (centerY < 150) {
-      position = '页面顶部';
-      if (centerX < 480) detailedLocation = '标题区域';
-      else detailedLocation = '导航区域';
+      position = 'Top of the page';
+      if (centerX < 480) detailedLocation = 'Title Area';
+      else detailedLocation = 'Navigation area';
     } else if (centerY > 600) {
-      position = '页面底部';
-      detailedLocation = '按钮操作区';
+      position = 'Bottom of the page';
+      detailedLocation = 'Button operation area';
     } else if (centerY > 250 && centerY < 450) {
-      position = '页面中部';
-      if (centerX < 300) detailedLocation = '左侧功能区';
-      else if (centerX > 600) detailedLocation = '右侧功能区';
-      else detailedLocation = '主要内容区';
+      position = 'Middle of the page';
+      if (centerX < 300) detailedLocation = 'Left ribbon';
+      else if (centerX > 600) detailedLocation = 'Right functional area';
+      else detailedLocation = 'Main content area';
     } else {
-      position = '页面中间偏上';
-      detailedLocation = '副标题区域';
+      position = 'Upper middle of the page';
+      detailedLocation = 'Subtitle area';
     }
     
     // 根据具体位置、尺寸和index生成不同描述
     const descriptions = [];
     
     if (height < 30 && width > 200) {
-      descriptions.push(`${position}${detailedLocation}的文字内容与设计稿字体大小不一致，实际高度${height}px偏小`);
-      descriptions.push(`${position}横向文字排列间距存在差异，实际宽度${width}px与设计稿不符`);
-      descriptions.push(`${position}文字行高和字间距与设计稿存在细微偏差，影响整体视觉效果`);
+      descriptions.push(`The text content of ${position}${detailedLocation} is inconsistent with the font size of the design draft, and the actual height ${height}px is too small`);
+      descriptions.push(`${position} The horizontal text arrangement spacing is different, and the actual width ${width}px does not match the design draft`);
+      descriptions.push(`${position}The text line height and spacing are slightly different from the design draft, affecting the overall visual effect`);
     } else if (width < 80 && height < 80) {
-      descriptions.push(`${position}${detailedLocation}的图标尺寸与设计稿不匹配，当前${width}×${height}px偏小`);
-      descriptions.push(`${position}小图标颜色或透明度与设计稿存在差异，需要调整视觉效果`);
-      descriptions.push(`${position}功能图标位置偏移，距离边距${x}px与设计稿布局不一致`);
+      descriptions.push(`The icon size of ${position}${detailedLocation} does not match the design draft, the current ${width}×${height}px is too small`);
+      descriptions.push(`${position}The color or transparency of the small icon is different from the design draft, and the visual effect needs to be adjusted`);
+      descriptions.push(`${position} function icon position offset, distance ${x}px from margin is inconsistent with the design layout`);
     } else if (width > 150 && height > 30 && height < 100) {
-      descriptions.push(`${position}${detailedLocation}的按钮样式与设计稿差异明显，尺寸${width}×${height}px需要调整`);
-      descriptions.push(`${position}交互按钮的圆角半径和边框颜色与设计稿不符，影响用户体验`);
-      descriptions.push(`${position}按钮内边距和背景色与设计稿存在视觉差异，需要优化样式`);
+      descriptions.push(`The button style of ${position}${detailedLocation} is obviously different from the design draft, and the size ${width}×${height}px needs to be adjusted`);
+      descriptions.push(`The corner radius and border color of the ${position} interactive button do not match the design draft, affecting the user experience`);
+      descriptions.push(`${position}Button padding and background color are visually different from the design draft and need to be optimized`);
     } else if (area > 8000) {
-      descriptions.push(`${position}${detailedLocation}整体布局与设计稿存在较大差异，区域面积${Math.round(area)}px²过大`);
-      descriptions.push(`${position}大容器的背景色和内容排列与设计稿不一致，需要重新调整布局结构`);
-      descriptions.push(`${position}主要内容区域的间距分配不均匀，与设计稿的视觉层级不符`);
+      descriptions.push(`${position}${detailedLocation}The overall layout is quite different from the design draft, and the area ${Math.round(area)}px² is too large`);
+      descriptions.push(`${position}The background color and content arrangement of the large container are inconsistent with the design draft, and the layout structure needs to be readjusted`);
+      descriptions.push(`${position}The spacing of the main content area is uneven and does not match the visual hierarchy of the design draft`);
     } else {
-      descriptions.push(`${position}${detailedLocation}的UI组件与设计稿存在细节差异，位置(${x},${y})需要微调`);
-      descriptions.push(`${position}元素的视觉呈现与设计稿不完全匹配，尺寸${width}×${height}px需要优化`);
-      descriptions.push(`${position}界面细节处理不够精准，与设计稿的预期效果有偏差`);
+      descriptions.push(`The UI component of ${position}${detailedLocation} has some details different from the design draft, and the position (${x},${y}) needs to be fine-tuned`);
+      descriptions.push(`The visual presentation of the ${position} element does not fully match the design draft, and the size ${width}×${height}px needs to be optimized`);
+      descriptions.push(`${position} The interface details are not handled accurately enough and deviate from the expected effect of the design draft`);
     }
     
     // 根据index选择不同的描述，确保多样性
@@ -2435,29 +2435,29 @@ function App() {
     const suggestions = [];
     
     if (height < 30 && width > 200) {
-      suggestions.push(`调整文字font-size为${Math.max(14, Math.round(height * 0.8))}px，line-height设置为${(height * 1.2).toFixed(1)}px`);
-      suggestions.push(`修改文字color值，建议使用#333333或#666666，确保与设计稿颜色一致`);
-      suggestions.push(`检查font-family字体族，建议使用'PingFang SC', 'Microsoft YaHei', Arial等系统字体`);
+      suggestions.push(`Adjust text font-size to ${Math.max(14, Math.round(height * 0.8))}px, and line-height to ${(height * 1.2).toFixed(1)}px`);
+      suggestions.push(`Modify the text color value. It is recommended to use #333333 or #666666 to ensure consistency with the design color`);
+      suggestions.push(`Check font-family font family, it is recommended to use system fonts such as 'PingFang SC', 'Microsoft YaHei', Arial, etc.`);
     } else if (width < 80 && height < 80) {
-      suggestions.push(`调整图标尺寸为${Math.max(24, Math.round((width + height) / 2))}px × ${Math.max(24, Math.round((width + height) / 2))}px，保持正方形比例`);
-      suggestions.push(`检查图标的fill属性或background-image，确保颜色值与设计稿#FFFFFF或主题色一致`);
-      suggestions.push(`添加适当的margin: ${Math.round(width * 0.2)}px，确保图标与周围元素的间距符合设计稿`);
+      suggestions.push(`Adjust icon size to ${Math.max(24, Math.round((width + height) / 2))}px × ${Math.max(24, Math.round((width + height) / 2))}px, keeping square proportions`);
+      suggestions.push(`Check the fill property or background-image of the icon and make sure the color value is consistent with the design draft #FFFFFF or the theme color`);
+      suggestions.push(`Add appropriate margin: ${Math.round(width * 0.2)}px to ensure that the spacing between the icon and surrounding elements is consistent with the design draft`);
     } else if (width > 150 && height > 30 && height < 100) {
-      suggestions.push(`设置按钮padding: ${Math.round(height * 0.25)}px ${Math.round(width * 0.1)}px，border-radius: ${Math.round(height * 0.2)}px`);
-      suggestions.push(`修改按钮background-color和border颜色，建议使用主题色#1890FF或#52C41A`);
-      suggestions.push(`调整按钮font-size为${Math.round(height * 0.4)}px，font-weight设置为500或600增强可读性`);
+      suggestions.push(`Set button padding: ${Math.round(height * 0.25)}px ${Math.round(width * 0.1)}px, border-radius: ${Math.round(height * 0.2)}px`);
+      suggestions.push(`Modify the button background-color and border color. It is recommended to use the theme color #1890FF or #52C41A`);
+      suggestions.push(`Adjust the button font-size to ${Math.round(height * 0.4)}px and set the font-weight to 500 or 600 to enhance readability`);
     } else if (area > 8000) {
-      suggestions.push(`重新规划容器布局，建议使用flexbox或grid，设置max-width: ${Math.round(width * 0.9)}px限制宽度`);
-      suggestions.push(`调整容器的padding: ${Math.round(height * 0.05)}px ${Math.round(width * 0.05)}px，优化内容间距`);
-      suggestions.push(`检查容器background-color，建议使用渐变色linear-gradient(135deg, #667eea 0%, #764ba2 100%)`);
+      suggestions.push(`Re-plan the container layout. It is recommended to use flexbox or grid. Set max-width: ${Math.round(width * 0.9)}px to limit the width`);
+      suggestions.push(`Adjust container padding: ${Math.round(height * 0.05)}px ${Math.round(width * 0.05)}px to optimize content spacing`);
+      suggestions.push(`Check the container background-color, it is recommended to use a gradient color linear-gradient(135deg, #667eea 0%, #764ba2 100%)`);
     } else if (centerY < 200) {
-      suggestions.push(`调整顶部区域的margin-top: ${Math.round(20 + index * 5)}px，确保与设计稿顶部间距一致`);
+      suggestions.push(`Adjust margin-top of the top area: ${Math.round(20 + index * 5)}px to ensure the same spacing as the top of the design draft`);
       suggestions.push(`修改标题区域的text-align: center，font-weight: bold，提升视觉层级`);
-      suggestions.push(`设置标题容器的padding: ${Math.round(10 + index * 3)}px 0，优化垂直间距`);
+      suggestions.push(`Modify the title area's text-align: center, font-weight: bold to enhance visual hierarchy`);
     } else {
-      suggestions.push(`微调元素位置，建议设置position: relative; left: ${Math.round((index + 1) * 2)}px`);
-      suggestions.push(`优化元素的box-shadow: 0 ${Math.round(2 + index)}px ${Math.round(4 + index * 2)}px rgba(0,0,0,0.1)增强层次感`);
-      suggestions.push(`调整元素透明度opacity: ${(0.95 - index * 0.05).toFixed(2)}，改善视觉融合度`);
+      suggestions.push(`Fine-tune the element position. It is recommended to set position: relative; left: ${Math.round((index + 1) * 2)}px`);
+      suggestions.push(`Optimize element's box-shadow: 0 ${Math.round(2 + index)}px ${Math.round(4 + index * 2)}px rgba(0,0,0,0.1) to enhance the sense of hierarchy`);
+      suggestions.push(`Adjust element opacity: ${(0.95 - index * 0.05).toFixed(2)} to improve visual integration`);
     }
     
     // 根据index和区域特征选择不同建议
@@ -2494,25 +2494,25 @@ function App() {
         suggestion: generateSmartSuggestion(region, index)
       }));
       
-      console.log(`🎯 检测到 ${problemAreas.length} 个差异区域`);
+      console.log(`🎯 ${problemAreas.length} difference areas detected`);
       return problemAreas.length > 0 ? problemAreas : await performBasicDifferenceDetection(webCanvas);
       
     } catch (error) {
-      console.error('真实差异检测失败:', error);
+      console.error('True difference detection failed:', error);
       return await performBasicDifferenceDetection(webCanvas);
     }
   };
 
   // 🔧 基础差异检测算法（备用方案）
   const performBasicDifferenceDetection = async (webCanvas) => {
-    console.log('🔧 使用基础检测算法生成框选区域');
+    console.log('🔧 Generate a selection area using a basic detection algorithm');
     
     // 基于图像亮度变化检测重要区域
     const regions = await detectImportantRegions(webCanvas);
     
     // 如果检测到的区域太少，添加一些演示用的固定区域
     if (regions.length < 2) {
-      console.log('⚠️ 自动检测区域不足，添加演示区域确保有结果显示');
+      console.log('⚠️ The automatic detection area is insufficient, add a demonstration area to ensure that the results are displayed');
       
       // 根据canvas尺寸添加合理的演示区域
       const canvasWidth = webCanvas.width;
@@ -2695,13 +2695,13 @@ function App() {
       return [
         {
           x: 413, y: 45, width: 220, height: 15,
-          description: '导航菜单项间距与设计稿不一致，文字对齐方式存在偏差',
-          suggestion: '调整导航菜单的gap为24px，确保文字水平居中对齐'
+          description: 'The spacing between navigation menu items is inconsistent with the design draft, and there is a deviation in the text alignment',
+          suggestion: 'Adjust the navigation menu gap to 24px to ensure the text is horizontally centered.'
         },
         {
           x: 355, y: 200, width: 290, height: 40,
-          description: '主标题文字颜色和字体大小与设计稿不一致',
-          suggestion: '修改主标题的font-size为42px，font-weight为700'
+          description: 'The main title text color and font size are inconsistent with the design draft',
+          suggestion: 'Change the font-size of the main title to 42px and the font-weight to 700'
         }
       ];
     }
@@ -2735,17 +2735,17 @@ function App() {
       // 执行差异检测
       const differences = performAutoDifferenceDetection(webData, designData, webCanvas.width, webCanvas.height);
       
-      console.log(`✅ 自动检测完成，发现 ${differences.length} 个差异区域`);
+      console.log(`✅ Automatic detection completed, ${differences.length} difference areas found`);
       return differences;
       
     } catch (error) {
-      console.error('自动差异检测失败:', error);
+      console.error('Automatic difference detection failed:', error);
       // 返回备用的固定区域
       return [
         {
           x: 380, y: 370, width: 240, height: 110,
-          description: '功能图标区域间距不均匀，图标与文字垂直对齐有偏差',
-          suggestion: '调整图标间距为40px，图标大小统一为48px'
+          description: 'The spacing between the function icons is uneven, and the vertical alignment between the icons and text is deviated',
+          suggestion: 'Adjust the icon spacing to 40px and the icon size to 48px'
         }
       ];
     }
@@ -2806,13 +2806,13 @@ function App() {
       differences.push(
         {
           x: 355, y: 200, width: 290, height: 40,
-          description: '主标题区域检测到视觉差异，可能涉及字体或颜色',
-          suggestion: '检查主标题的字体粗细和颜色值是否与设计稿一致'
+          description: 'A visual discrepancy was detected in the main title area, possibly involving font or color',
+          suggestion: 'Check whether the font weight and color value of the main title are consistent with the design draft'
         },
         {
           x: 380, y: 370, width: 240, height: 110,
-          description: '功能区域检测到布局差异，元素对齐可能存在偏差',
-          suggestion: '检查功能图标的间距和垂直对齐方式'
+          description: 'Layout differences are detected in the functional area, and element alignment may be deviated',
+          suggestion: 'Check the spacing and vertical alignment of feature icons'
         }
       );
     }
@@ -2878,14 +2878,14 @@ function App() {
     const avgDiff = region.totalDiff / region.pixelCount;
     
     let location = '';
-    if (centerY < canvasHeight * 0.3) location = '页面顶部';
-    else if (centerY > canvasHeight * 0.7) location = '页面底部';
-    else location = '页面中部';
+    if (centerY < canvasHeight * 0.3) location = 'Top of the page';
+    else if (centerY > canvasHeight * 0.7) location = 'Bottom of the page';
+    else location = 'Middle of the page';
     
     if (avgDiff > 100) {
-      return `${location}检测到显著的颜色差异，与设计稿存在明显偏差`;
+      return `${location}Significant color differences were detected, and there was a clear deviation from the design draft.`;
     } else {
-      return `${location}检测到轻微的视觉差异，细节处理可能不够精确`;
+      return `${location}Slight visual differences detected, detail processing may not be precise enough`;
     }
   };
 
@@ -2896,11 +2896,11 @@ function App() {
     const avgDiff = region.totalDiff / region.pixelCount;
     
     if (height < 50 && width > 100) {
-      return '可能是文字相关问题，检查字体大小、颜色或行高设置';
+      return 'It may be a text-related issue. Check the font size, color, or line height settings.';
     } else if (width < 100 && height < 100) {
-      return '可能是图标或按钮问题，检查尺寸、颜色或圆角设置';
+      return 'There may be an issue with the icon or button. Check the size, color, or corner radius settings.';
     } else {
-      return '检查该区域的布局、间距或背景色是否与设计稿保持一致';
+      return 'Check whether the layout, spacing or background color of the area is consistent with the design draft';
     }
   };
 
@@ -2948,7 +2948,7 @@ function App() {
       
       return null;
     } catch (error) {
-      console.error('内容边界检测失败:', error);
+      console.error('Content boundary detection failed:', error);
       return null;
     }
   };
@@ -2971,20 +2971,20 @@ function App() {
 
   const generateMockOCRText = (element) => {
     const mockTexts = {
-      'button': '登录按钮',
-      'text': '页面标题文字',
-      'navigation': '导航菜单',
-      'container': '内容区域',
-      'image': '图片元素'
+      'button': 'Login Button',
+      'text': 'Page title text',
+      'navigation': 'Navigation Menu',
+      'container': 'Content Area',
+      'image': 'Image elements'
     };
     return mockTexts[element.elementType] || '未识别元素';
   };
 
   const generateTextDifference = (element) => {
     return {
-      expected: '设计稿中的文字',
-      actual: '实际页面文字',
-      difference: '字体大小不一致'
+      expected: 'Text in the design',
+      actual: 'Actual page text',
+      difference: 'Inconsistent font sizes'
     };
   };
 
@@ -2996,37 +2996,37 @@ function App() {
     switch (type) {
       case 'text_difference':
         if (features.averageBrightnessDifference > 50) {
-          return `${position}文字亮度与设计稿差异较大，实际亮度偏${features.averageBrightnessDifference > 0 ? '亮' : '暗'}`;
+          return `${position}The text brightness is significantly different from the design draft, and the actual brightness is ${features.averageBrightnessDifference > 0 ? 'bright' : 'dark'}`;
         } else if (features.isLikelyText) {
-          return `${position}文字样式与设计稿不一致，字体或大小存在差异`;
+          return `${position} text style is inconsistent with the design draft, and there are differences in font or size`;
         }
-        return `${position}文字区域与设计稿存在差异`;
+        return `${position} text area is different from the design draft`;
         
       case 'color_difference':
         const colorDesc = getColorDifferenceDescription(features);
-        return `${position}颜色与设计稿不符，${colorDesc}`;
+        return `${position} color does not match the design draft, ${colorDesc}`;
         
       case 'missing_element':
-        return `${position}缺少设计稿中的元素，区域大小约 ${width}×${height}px`;
+        return `${position} is missing the element in the design draft, the area size is about ${width}×${height}px`;
         
       case 'button_or_control_difference':
         if (features.averageContrastDifference > 30) {
-          return `${position}按钮或控件样式差异，边框或背景与设计稿不符`;
+          return `${position}Button or control style is different, border or background does not match the design draft`;
         }
-        return `${position}交互元素与设计稿存在差异`;
+        return `${position}Interactive element differs from the design draft`;
         
       case 'icon_difference':
       case 'small_icon_difference':
-        return `${position}图标与设计稿不一致，可能是颜色、大小或样式差异`;
+        return `${position} icon is inconsistent with the design, possibly due to color, size or style differences`;
         
       case 'layout_difference':
-        return `${position}布局与设计稿存在差异，元素位置或排列不符`;
+        return `${position} The layout is different from the design draft, and the element position or arrangement does not match`;
         
       case 'brightness_difference':
-        return `${position}亮度与设计稿差异明显，整体${features.averageBrightnessDifference > 0 ? '过亮' : '过暗'}`;
+        return `${position} brightness is significantly different from the design draft, overall ${features.averageBrightnessDifference > 0 ? 'Too bright' : 'Too dark'}`;
         
       default:
-        return `${position}视觉效果与设计稿存在差异`;
+        return `${position}The visual effect is different from the design draft`;
     }
   };
 
@@ -3037,56 +3037,56 @@ function App() {
     switch (type) {
       case 'text_difference':
         if (features.averageBrightnessDifference > 50) {
-          return `调整文字颜色或背景，减少${Math.round(features.averageBrightnessDifference)}点亮度差异`;
+          return `Adjust text color or background to reduce brightness difference by ${Math.round(features.averageBrightnessDifference)} points`;
         } else if (features.aspectRatio > 5) {
-          return '调整文字行高或字间距，使其符合设计稿比例';
+          return 'Adjust the text line height or word spacing to make it fit the design draft proportions';
         }
-        return '检查字体、字号、颜色是否与设计稿一致';
+        return 'Check whether the font, size and color are consistent with the design draft';
         
       case 'color_difference':
         const suggestions = [];
-        if (features.averageRedDifference > 30) suggestions.push(`红色通道减少${Math.round(features.averageRedDifference)}`);
-        if (features.averageGreenDifference > 30) suggestions.push(`绿色通道减少${Math.round(features.averageGreenDifference)}`);
-        if (features.averageBlueDifference > 30) suggestions.push(`蓝色通道减少${Math.round(features.averageBlueDifference)}`);
-        return suggestions.length > 0 ? suggestions.join('，') : '调整颜色值使其接近设计稿';
+        if (features.averageRedDifference > 30) suggestions.push(`Red channel reduction ${Math.round(features.averageRedDifference)}`);
+        if (features.averageGreenDifference > 30) suggestions.push(`Reduce green channel by ${Math.round(features.averageGreenDifference)}`);
+        if (features.averageBlueDifference > 30) suggestions.push(`reduce blue channel by ${Math.round(features.averageBlueDifference)}`);
+        return suggestions.length > 0 ? suggestions.join('，') : 'Adjust the color value to make it close to the design draft';
         
       case 'missing_element':
-        return `添加缺失的元素，建议尺寸 ${width}×${height}px`;
+        return `Add missing elements, suggested size ${width}×${height}px`;
         
       case 'button_or_control_difference':
         if (features.averageContrastDifference > 30) {
-          return '调整按钮边框、背景色或阴影效果';
+          return 'Adjust button border, background color or shadow effect';
         }
-        return '检查按钮圆角、内边距是否符合设计稿';
+        return 'Check whether the button radius and inner margin are in line with the design draft';
         
       case 'icon_difference':
       case 'small_icon_difference':
-        return `检查图标颜色、大小，建议尺寸约 ${width}×${height}px`;
+        return `Check the icon color and size. The recommended size is about ${width}×${height}px`;
         
       case 'layout_difference':
         if (features.aspectRatio > 5) {
-          return '调整元素宽度或水平排列方式';
+          return 'Adjust element width or horizontal arrangement';
         } else if (features.aspectRatio < 0.2) {
-          return '调整元素高度或垂直排列方式';
+          return 'Adjust element height or vertical arrangement';
         }
-        return '检查元素位置、间距是否符合设计稿布局';
+        return 'Check whether the element position and spacing conform to the design layout';
         
       case 'brightness_difference':
         const brightnessChange = Math.round(Math.abs(features.averageBrightnessDifference));
-        return `整体${features.averageBrightnessDifference > 0 ? '降低' : '提高'}亮度约${brightnessChange}点`;
+        return `Overall ${features.averageBrightnessDifference > 0 ? 'Decrease' : 'Increase'} brightness by about ${brightnessChange} points`;
         
       default:
-        return '对照设计稿调整视觉样式';
+        return 'Adjust the visual style according to the design draft';
     }
   };
   
   // 获取位置描述
   const getPositionDescription = (x, y) => {
     // 根据位置返回区域描述
-    if (y < 100) return '页面顶部';
-    if (y > 600) return '页面底部';
-    if (x < 200) return '页面左侧';
-    if (x > 800) return '页面右侧';
+    if (y < 100) return 'Top of the page';
+    if (y > 600) return 'Bottom of the page';
+    if (x < 200) return 'Left side of the page';
+    if (x > 800) return 'Right side of the page';
     return '页面中部';
   };
   
@@ -3096,13 +3096,13 @@ function App() {
     const maxDiff = Math.max(averageRedDifference, averageGreenDifference, averageBlueDifference);
     
     if (averageRedDifference === maxDiff && maxDiff > 30) {
-      return '红色偏差较大';
+      return 'Large red deviation';
     } else if (averageGreenDifference === maxDiff && maxDiff > 30) {
-      return '绿色偏差较大';
+      return 'Large green deviation';
     } else if (averageBlueDifference === maxDiff && maxDiff > 30) {
-      return '蓝色偏差较大';
+      return 'Large deviation in blue';
     }
-    return '整体色调存在差异';
+    return 'There are differences in overall color tone';
   };
 
   const createMarkedScreenshot = async (baseScreenshot, element) => {
@@ -3130,18 +3130,18 @@ function App() {
       
       return canvas.toDataURL('image/png');
     } catch (error) {
-      console.error('创建标记截图失败:', error);
+      console.error('Failed to create marked screenshot:', error);
       return baseScreenshot;
     }
   };
 
   // Demo版本：直接使用预设截图数据（模拟之前的效果）
   const generateDemoAIIssues = async () => {
-    console.log('开始生成Demo AI问题...');
+    console.log('Start generating Demo AI questions...');
     
     try {
       // 产品演示版本：必定生成结果，直接使用预设的紫色页面截图
-      console.log('产品演示模式：AI必定检测到差异问题');
+      console.log('Product Demo Mode: AI will definitely detect discrepancies');
 
       // 先获取基础截图
       let baseCanvas;
@@ -3164,7 +3164,7 @@ function App() {
           });
         }
       } catch (error) {
-        console.log('截图失败，使用备用方案:', error);
+        console.log('Screenshot failed, use the backup solution:', error);
         // 创建一个紫色背景的canvas作为演示
         baseCanvas = document.createElement('canvas');
         baseCanvas.width = designSize.width;
@@ -3182,18 +3182,18 @@ function App() {
         ctx.fillStyle = 'white';
         ctx.font = 'bold 28px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('专业的UI走查工具', baseCanvas.width / 2, baseCanvas.height * 0.3);
+        ctx.fillText('Professional UI walkthrough tool', baseCanvas.width / 2, baseCanvas.height * 0.3);
         
         // 绘制按钮
         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.fillRect(baseCanvas.width / 2 - 60, baseCanvas.height * 0.6 - 20, 120, 40);
         ctx.fillStyle = '#6B4B9E';
         ctx.font = '16px Arial';
-        ctx.fillText('立即体验', baseCanvas.width / 2, baseCanvas.height * 0.6 + 5);
+        ctx.fillText('Try it now', baseCanvas.width / 2, baseCanvas.height * 0.6 + 5);
       }
 
       // 🤖 自动图像差异检测和框选生成
-      console.log('🔍 启动自动差异检测算法...');
+      console.log('🔍 Starting the automatic difference detection algorithm...');
       
       let problemAreas = [];
       
@@ -3202,13 +3202,13 @@ function App() {
         try {
           const designImg = await loadImage(aiUploadedImages[0].data);
           problemAreas = await performRealDifferenceDetection(baseCanvas, designImg);
-          console.log(`✅ 自动检测完成，发现 ${problemAreas.length} 个差异区域`);
+          console.log(`✅ Automatic detection completed, ${problemAreas.length} difference areas found`);
         } catch (error) {
-          console.error('自动检测失败，使用备用检测:', error);
+          console.error('Automatic detection failed, using alternative detection:', error);
           problemAreas = await performBasicDifferenceDetection(baseCanvas);
         }
       } else {
-        console.log('⚠️ 无设计图，使用基础检测算法');
+        console.log('⚠️ No design diagram, using basic detection algorithm');
         problemAreas = await performBasicDifferenceDetection(baseCanvas);
       }
 
@@ -3257,8 +3257,8 @@ function App() {
         screenshot: screenshots[index],
         description: area.description,
         suggestion: area.suggestion,
-        status: '未验收',
-        source: 'AI走查'
+        status: 'Not accepted',
+        source: 'AI inspection'
       }));
 
       console.log(`✅ 成功生成 ${mockIssues.length} 个AI问题`);
@@ -3277,12 +3277,12 @@ function App() {
     const aiFileInputRef = useRef(null);
 
     const handleFileChange = (e) => {
-      console.log('DragUpload handleFileChange 被调用');
+      console.log('DragUpload handleFileChange is called');
       const files = e.target.files;
-      console.log('选择的文件:', files ? files.length : 0);
+      console.log('Selected file:', files ? files.length : 0);
       
       if (files && files.length > 0) {
-        console.log('调用onUpload函数，文件:', files[0].name);
+        console.log('Call onUpload function, file:', files[0].name);
         onUpload(files);
       }
       // 重置input值，允许选择相同文件
@@ -3332,9 +3332,9 @@ function App() {
           }}
         >
           <div style={{ fontSize: '32px', marginBottom: '10px' }}>🎨</div>
-          <div style={{ fontSize: '16px', marginBottom: '8px' }}>点击或拖拽设计图到这里</div>
+          <div style={{ fontSize: '16px', marginBottom: '8px' }}>Click or drag the design here</div>
           <div style={{ fontSize: '12px', color: '#666' }}>
-            支持PNG、JPG、JPEG格式，文件不超过10MB
+            Support PNG, JPG, JPEG formats, the file size should not exceed 10MB
           </div>
         </div>
       </div>
@@ -3360,7 +3360,7 @@ function App() {
         screenshot: modalScreenshot,
         description: currentIssue.description,
         suggestion: currentIssue.suggestion,
-        status: '未验收'
+        status: 'Not accepted'
       };
 
       if (editingIssueId) {
@@ -3502,27 +3502,27 @@ function App() {
       `;
 
       issues.forEach((issue, index) => {
-        const status = issue.status || '未修改';
+        const status = issue.status || 'Unmodified改';
         
         html += `
           <div class="issue-item">
             <div class="issue-header">
-              问题 ${index + 1}
+              Question ${index + 1}
             </div>
             
             <div style="text-align: center;">
-              <img class="screenshot" src="${issue.screenshot}" alt="问题${index + 1}截图" />
+              <img class="screenshot" src="${issue.screenshot}" alt="Screenshot of issue ${index + 1}" />
             </div>
             
             <div class="info-section">
-              <div class="info-label">问题描述：</div>
-              <div class="info-content">${issue.description || '无描述'}</div>
+              <div class="info-label">Issue description:</div>
+              <div class="info-content">${issue.description || 'No description'}</div>
               
               <div class="info-label">修改建议：</div>
-              <div class="info-content">${issue.suggestion || '无建议'}</div>
+              <div class="info-content">${issue.suggestion || 'No recommendations'}</div>
               
-              <div class="info-label">验收状态：</div>
-              <div class="info-content">未验收</div>
+              <div class="info-label">Acceptance status:</div>
+              <div class="info-content">Not accepted</div>
             </div>
           </div>
         `;
@@ -3540,14 +3540,14 @@ function App() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `UI走查报告_${new Date().toISOString().slice(0, 10)}.doc`;
+      a.download = `UI inspection Report_${new Date().toISOString().slice(0, 10)}.doc`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
     } catch (error) {
-      console.error('导出Excel失败:', error);
+      console.error('Export to Excel failed:', error);
       alert('Export Excel failed, please try again: ' + error.message);
     }
   };
@@ -3986,37 +3986,37 @@ function App() {
         <div className="screenshot-tip">
           <div className="tip-content">
             <span className="tip-text">
-              📸 可在红框限定区域内进行截图，请使用 Win+Shift+S，截图完成后在问题列表中点击"粘贴截图"
+              📸 You can take a screenshot in the area defined by the red frame. Please press Win+Shift+S. After taking the screenshot, click "Paste Screenshot" in the question list.
             </span>
             <button className="tip-close" onClick={closeScreenshotTip}>×</button>
           </div>
         </div>
       )}
 
-      {/* 页面切换检测提示 */}
+      {/* Page switching detection prompt */}
       {pageChangeDetected && isMultiPageMode && (
         <div className="page-change-notification">
           <div className="notification-content">
             <span className="notification-icon">🔄</span>
             <span className="notification-text">
-              检测到页面切换：{currentPageInfo?.title || '未知页面'}
-              {autoScreenshotEnabled && ' - 正在自动截图...'}
+              检测到页面切换：{currentPageInfo?.title || 'Unknown page'}
+              {autoScreenshotEnabled && ' - Automatically taking screenshots...'}
             </span>
           </div>
         </div>
       )}
 
-      {/* 多页面信息面板 */}
+      {/* Multi-page information panel */}
       {isMultiPageMode && Object.keys(pageScreenshots).length > 0 && (
         <div className="multi-page-info-panel">
           <div className="info-panel-header">
-            <h4>📁 多页面截图记录</h4>
+            <h4>📁 Multi-page screenshot records</h4>
             <div className="panel-header-actions">
               <button 
                 className="panel-toggle" 
                 onClick={() => setShowPagePanel(!showPagePanel)}
               >
-                {showPagePanel ? '收起' : '展开'}
+                {showPagePanel ? 'Close' : 'Expand'}
               </button>
             </div>
           </div>
@@ -4037,19 +4037,19 @@ function App() {
                     <div className="page-info">
                       <div className="page-title">{pageData.pageInfo.title}</div>
                       <div className="page-url">{pageData.pageInfo.pathname}</div>
-                      <div className="page-type">类型: {pageData.pageInfo.pageType}</div>
+                      <div className="page-type">type: {pageData.pageInfo.pageType}</div>
                       {matchInfo ? (
                         <div className="match-info success">
-                          ✅ 匹配: {matchInfo.designImage.name} ({(matchInfo.score * 100).toFixed(0)}%)
+                          ✅ match: {matchInfo.designImage.name} ({(matchInfo.score * 100).toFixed(0)}%)
                         </div>
                       ) : (
                         <div className="match-info no-match">
-                          ⚠️ 未找到匹配的设计图
+                          ⚠️ No matching designs found
                         </div>
                       )}
                       <div className="page-actions">
                         <div style={{ fontSize: '12px', color: '#666' }}>
-                          点击图片可放大查看
+                          Click on the image to enlarge it
                         </div>
                       </div>
                     </div>
@@ -4071,9 +4071,9 @@ function App() {
             <img
               className="modal-screenshot"
               src={modalScreenshot}
-              alt="截图"
+              alt="screenshot"
               onDoubleClick={() => setEnlargedImage(modalScreenshot)}
-              title="双击放大查看"
+              title="Double-click to enlarge"
             />
 
             <div className="form-group">
@@ -4095,10 +4095,10 @@ function App() {
                 className="form-textarea"
                 value={currentIssue.suggestion}
                 onChange={(e) => setCurrentIssue({...currentIssue, suggestion: e.target.value})}
-                placeholder="请提供精确的修改数值，如：按钮向右移动5px、字体大小改为16px、颜色改为#1890FF、行高改为1.5等"
+                placeholder="Please provide the exact modified values, such as: move the button 5px to the right, change the font size to 16px, change the color to #1890FF, change the line height to 1.5, etc."
               />
               <div className="form-placeholder">
-                提示：请提供具体的像素值、颜色值、字体大小等精确数值，便于开发人员直接修改
+                Tip:Please provide the exact modified values, such as: move the button 5px to the right, change the font size to 16px, change the color to #1890FF, change the line height to 1.5, etc.
               </div>
             </div>
 
@@ -4120,19 +4120,19 @@ function App() {
                 Cancel
               </button>
               <button className="modal-button primary" onClick={saveIssue}>
-                {editingIssueId ? '保存修改' : '添加问题'}
+                {editingIssueId ? 'Save changes' : 'Add Issue'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* AI走查弹窗 */}
+      {/* AI walkthrough pop-up window */}
       {showAIModal && (
         <div className="modal-overlay">
           <div className="ai-modal" style={{ overflow: isAIProcessing ? 'hidden' : 'auto' }}>
             <h3 className="modal-title">
-              🤖 AI智能走查
+              🤖 AI Inspection
             </h3>
             
             {!isAIProcessing ? (
@@ -4140,20 +4140,20 @@ function App() {
                 <div className="ai-upload-section">
                   <div className="upload-tabs">
                     <div className="tab-content">
-                      <h4>上传设计图</h4>
+                      <h4>Upload design drawing</h4>
                       <p className="upload-description">
-                        上传当前页面的设计图，AI将自动比较设计稿与页面实现，识别差异并生成问题报告。
+                        Upload the design drawing of the current page, and AI will automatically compare the design draft with the page implementation, identify the differences and generate a problem report.
                       </p>
                       
-                      {/* 单文件上传区域 */}
+                      {/* Single file upload area */}
                       <DragUpload onUpload={handleAIImageUpload} />
                     </div>
                   </div>
                   
-                  {/* 已上传设计图显示 */}
+                  {/* Uploaded design drawing display */}
                   {aiUploadedImages.length > 0 && (
                     <div className="uploaded-design">
-                      <h4>设计图预览</h4>
+                      <h4>Design preview</h4>
                       <div className="design-preview" style={{ position: 'relative', display: 'inline-block' }}>
                         <img 
                           src={aiUploadedImages[0].data} 
@@ -4218,7 +4218,7 @@ function App() {
                     onClick={startAIInspection}
                     disabled={aiUploadedImages.length === 0}
                   >
-                    开始AI走查
+                    Start AI walkthrough
                   </button>
                 </div>
               </>
@@ -4226,7 +4226,7 @@ function App() {
               <div className="ai-processing" style={{ overflow: 'hidden' }}>
                 <div className="processing-header">
                   <div className="processing-icon">🔄</div>
-                  <h4>AI走查进行中...</h4>
+                  <h4>AI walkthrough in progress...</h4>
                 </div>
                 
                 <div className="progress-container">
@@ -4241,8 +4241,8 @@ function App() {
                 </div>
                 
                 <div className="processing-info">
-                  <p>正在分析您的设计图与页面差异，请稍候...</p>
-                  <p>分析完成后，问题将自动添加到右侧问题列表中。</p>
+                  <p>Analyzing the differences between your design and page, please wait...</p>
+                  <p>Once the analysis is complete, the question will be automatically added to the question list on the right.</p>
                 </div>
               </div>
             )}
@@ -4250,7 +4250,7 @@ function App() {
         </div>
       )}
 
-      {/* AI未识别差异的悬浮提示 */}
+      {/* AI does not recognize the floating prompt of the difference */}
       {showNoDiffToast && (
         <div style={{
           position: 'fixed',
@@ -4267,40 +4267,40 @@ function App() {
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
           animation: 'fadeInOut 3s ease-in-out forwards'
         }}>
-          🤖 AI未能识别明显差异
+          🤖 AI fails to identify obvious differences
         </div>
       )}
 
-      {/* 图片放大显示模态框 */}
+      {/* Image zoom display modal box */}
       {enlargedImage && (
         <div className="image-enlargement-overlay" onClick={() => setEnlargedImage(null)}>
           <div className="image-enlargement-container" onClick={e => e.stopPropagation()}>
             <button 
               className="image-close-button" 
               onClick={() => setEnlargedImage(null)}
-              title="关闭"
+              title="closure"
             >
               ×
             </button>
             <img 
               className="enlarged-image" 
               src={enlargedImage} 
-              alt="放大查看" 
+              alt="Zoom in to view" 
               onDoubleClick={() => setEnlargedImage(null)}
             />
             <div className="image-enlargement-tip">
-              双击图片或点击背景关闭
+              Double-click the image or click the background to close
             </div>
           </div>
         </div>
       )}
 
-      {/* 视频教程模态框 */}
+      {/* Video tutorial modal box */}
       {showVideoTutorial && (
         <div className="modal-overlay">
           <div className="video-tutorial-modal">
             <div className="video-tutorial-header">
-              <h3>📹tutoria</h3>
+              <h3>📹tutorial</h3>
               <button 
                 className="modal-close-btn"
                 onClick={() => setShowVideoTutorial(false)}
@@ -4316,7 +4316,7 @@ function App() {
                 style={{ borderRadius: '8px' }}
               >
                 <source src="/tutorial-video.mp4" type="video/mp4" />
-                您的浏览器不支持视频播放，请升级到最新版本的浏览器。
+                Your browser does not support video playback, please upgrade to the latest version of the browser.
               </video>
               <p className="video-description">
                 This video demonstrates the complete usage process of the UI Walkthrough tool in detail, including page loading, design drawing upload, problem marking, and report export.
@@ -4327,7 +4327,7 @@ function App() {
                 className="modal-button primary"
                 onClick={() => setShowVideoTutorial(false)}
               >
-                知道了
+                knew
               </button>
             </div>
           </div>
